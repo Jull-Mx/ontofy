@@ -1,0 +1,1695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ontofy | Find where to study and how to get there</title>
+  <meta name="description" content="Tell Ontofy what you want to study. See leading universities in five countries, check off what you need to apply, then search flights.">
+  <meta name="theme-color" content="#E9F1F3">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230E2438'/%3E%3Ccircle cx='32' cy='32' r='12' fill='none' stroke='%23F5B63F' stroke-width='6'/%3E%3C/svg%3E">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,300..800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --mist: #E9F1F3;
+      --ink: #0E2438;
+      --teal: #0B7A85;
+      --teal-deep: #085F68;
+      --amber: #F5B63F;
+      --slate: #4F6577;
+      --line: #C9D8DE;
+      --paper: #FFFFFF;
+      --sky: #A9CDD6;
+      --tint: #DDEEF1;
+      --font: 'Bricolage Grotesque', 'Avenir Next', 'Segoe UI', system-ui, sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      min-height: 100svh;
+      background: var(--mist);
+      color: var(--ink);
+      font-family: var(--font);
+      font-size: 18px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button, input, select { font: inherit; color: inherit; }
+    button { cursor: pointer; }
+
+    .sr-only {
+      position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+    }
+
+    :focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+
+    .page {
+      min-height: 100vh;
+      min-height: 100svh;
+      display: flex;
+      flex-direction: column;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 clamp(1.25rem, 4vw, 3rem);
+    }
+
+    .bar { display: flex; align-items: center; padding: 1.5rem 0; }
+    body[data-screen='home'] .bar { visibility: hidden; }
+
+    .logo {
+      display: inline-flex; align-items: center; gap: 0.6rem;
+      font-weight: 800; font-size: 1.5rem; letter-spacing: -0.02em;
+      color: var(--ink); text-decoration: none;
+    }
+
+    .logo-mark {
+      width: 1.9rem; height: 1.9rem; border-radius: 0.55rem;
+      background: var(--ink); display: grid; place-items: center;
+    }
+
+    .logo-mark::before {
+      content: ''; width: 0.8rem; height: 0.8rem;
+      border: 0.24rem solid var(--amber); border-radius: 50%;
+    }
+
+    main { flex: 1; padding-bottom: 4rem; }
+    main:focus { outline: none; }
+
+    .screen { animation: fade 0.25s ease-out both; }
+    @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+
+    h1:focus, h2:focus { outline: none; }
+
+    /* Home: search engine welcome */
+    .home {
+      min-height: calc(100svh - 8rem);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center; padding-bottom: 5vh;
+    }
+
+    .welcome { margin: 0 0 0.5rem; font-size: 1.15rem; color: var(--slate); }
+
+    .wordmark {
+      margin: 0 0 2rem;
+      font-size: clamp(4rem, 14vw, 8.5rem);
+      line-height: 0.95; font-weight: 800; font-stretch: 82%;
+      letter-spacing: -0.045em;
+    }
+
+    .search {
+      width: min(100%, 40rem);
+      display: flex; align-items: center; gap: 0.5rem;
+      padding: 0.4rem 0.4rem 0.4rem 1.4rem;
+      background: var(--paper);
+      border: 1.5px solid #9DB5BF; border-radius: 999px;
+      transition: box-shadow 0.15s ease, border-color 0.15s ease;
+    }
+
+    .search:focus-within { border-color: var(--ink); box-shadow: 0 10px 30px -14px rgba(14, 36, 56, 0.45); }
+
+    .search input {
+      flex: 1; min-width: 0; height: 3.1rem; border: 0; background: transparent;
+      font-size: 1.15rem; outline: none;
+    }
+
+    .search input::placeholder { color: #6E8696; }
+
+    .search .go {
+      height: 3.1rem; padding: 0 1.5rem; border: 0; border-radius: 999px;
+      font-weight: 700; color: var(--paper); background: var(--teal);
+      transition: background-color 0.15s ease;
+    }
+
+    .search .go:hover { background: var(--teal-deep); }
+
+    .hint { min-height: 1.5rem; margin: 0.75rem 0 0; font-size: 0.95rem; color: #9A3B2B; }
+
+    .chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; margin: 0.5rem 0 0; padding: 0; list-style: none; max-width: 40rem; }
+
+    .chip {
+      padding: 0.4rem 0.95rem; font-size: 0.95rem;
+      background: transparent; border: 1.5px solid var(--line); border-radius: 999px;
+      transition: background-color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .chip:hover { background: var(--paper); border-color: #9DB5BF; }
+
+    .home-note { margin: 2.5rem 0 0; max-width: 30rem; font-size: 1rem; color: var(--slate); }
+
+    /* Shared headings */
+    .crumb {
+      display: inline-flex; align-items: center; gap: 0.4rem; margin: 0 0 1.25rem; padding: 0.25rem 0;
+      font-size: 1rem; font-weight: 600; color: var(--teal-deep);
+      background: none; border: 0; text-decoration: underline; text-underline-offset: 3px;
+    }
+
+    .title {
+      margin: 0 0 0.75rem;
+      font-size: clamp(2.2rem, 5.4vw, 3.8rem); line-height: 1; font-weight: 800;
+      font-stretch: 85%; letter-spacing: -0.03em; max-width: 18ch;
+    }
+
+    .sub { margin: 0 0 2.25rem; max-width: 38em; font-size: 1.1rem; color: var(--slate); }
+
+    /* Countries as a departure board */
+    .board { list-style: none; margin: 0; padding: 0; border-top: 2px dashed var(--line); }
+
+    .board li { border-bottom: 2px dashed var(--line); }
+
+    .row {
+      width: 100%; display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr) auto;
+      align-items: center; gap: 1.5rem; padding: 1.35rem 0.75rem; text-align: left;
+      background: transparent; border: 0; border-radius: 0.5rem;
+      transition: background-color 0.15s ease;
+    }
+
+    .row:hover { background: var(--paper); }
+
+    .row-name { font-size: clamp(1.8rem, 4vw, 2.7rem); font-weight: 800; font-stretch: 85%; letter-spacing: -0.03em; line-height: 1.05; }
+    .row-tag { font-size: 1rem; color: var(--slate); }
+    .row-count {
+      padding: 0.25rem 0.8rem; font-size: 0.9rem; font-weight: 600; white-space: nowrap;
+      background: var(--tint); color: var(--teal-deep); border-radius: 999px;
+    }
+
+    .disclaimer { margin: 1.75rem 0 0; max-width: 40em; font-size: 0.95rem; color: var(--slate); }
+
+    /* University cards */
+    .unis { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(15.5rem, 1fr)); gap: 1.1rem; }
+
+    .uni {
+      width: 100%; height: 100%; min-height: 14rem; display: flex; flex-direction: column;
+      padding: 1.25rem; text-align: left;
+      background: var(--paper); color: var(--ink);
+      border: 1.5px solid var(--line); border-radius: 1rem;
+      transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .uni-name { font-size: 1.35rem; font-weight: 700; line-height: 1.15; letter-spacing: -0.02em; }
+    .uni-city { margin-top: 0.2rem; font-size: 0.95rem; color: var(--slate); transition: color 0.2s ease; }
+
+    .swap { display: grid; margin-top: auto; padding-top: 1rem; }
+    .swap > * { grid-area: 1 / 1; transition: opacity 0.2s ease; }
+    .swap-rest { align-self: end; display: flex; flex-direction: column; gap: 0.5rem; }
+    .swap-more { opacity: 0; font-size: 0.95rem; line-height: 1.4; }
+    .swap-more strong { display: block; margin-top: 0.5rem; font-size: 0.9rem; color: var(--amber); }
+
+    .fly { font-size: 0.9rem; color: var(--slate); }
+
+    .pill {
+      align-self: flex-start; padding: 0.15rem 0.7rem; font-size: 0.85rem; font-weight: 600;
+      background: var(--tint); color: var(--teal-deep); border-radius: 999px;
+    }
+
+    .pill.done { background: var(--amber); color: var(--ink); }
+
+    .uni:hover, .uni:focus-visible { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+    .uni:hover .uni-city, .uni:focus-visible .uni-city { color: var(--sky); }
+    .uni:hover .swap-rest, .uni:focus-visible .swap-rest { opacity: 0; }
+    .uni:hover .swap-more, .uni:focus-visible .swap-more { opacity: 1; }
+    .uni:focus-visible { outline-color: var(--amber); }
+
+    @media (hover: none) {
+      .swap-rest { display: none; }
+      .swap-more { opacity: 1; }
+      .swap-more strong { color: var(--teal-deep); }
+      .uni:hover, .uni:focus-visible { background: var(--paper); color: var(--ink); border-color: var(--line); }
+      .uni:hover .uni-city { color: var(--slate); }
+    }
+
+
+    .callout {
+      margin: 0 0 1.5rem; padding: 0.9rem 1.1rem; max-width: 46rem;
+      font-size: 0.98rem; line-height: 1.45;
+      background: var(--paper); border-left: 5px solid var(--amber); border-radius: 0.3rem 0.8rem 0.8rem 0.3rem;
+    }
+
+    .callout strong { font-weight: 700; }
+
+    .more {
+      margin: 1.5rem 0 0; padding: 0.7rem 1.4rem; font-weight: 700;
+      background: transparent; border: 1.5px solid var(--ink); border-radius: 999px;
+      transition: background-color 0.15s ease, color 0.15s ease;
+    }
+
+    .more:hover { background: var(--ink); color: var(--paper); }
+
+    .pill.lang { background: #FBE6B8; color: var(--ink); }
+
+    .pill.s-verified { background: #CFE9D8; color: #0F4F2A; }
+    .pill.s-partial { background: #FBE6B8; color: var(--ink); }
+    .pill.s-none { background: #E3E9EC; color: #4C6272; }
+
+    .origin { display: flex; align-items: center; gap: 0.6rem; margin: 1.25rem 0 0; font-size: 0.95rem; color: var(--slate); }
+    .origin select {
+      height: 2.4rem; padding: 0 2rem 0 0.8rem; font-size: 0.95rem; color: var(--ink);
+      background-color: var(--paper); border: 1.5px solid var(--line); border-radius: 0.55rem;
+      appearance: none; -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 14 9' fill='none'%3E%3Cpath d='M1 1.5l6 6 6-6' stroke='%230E2438' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 0.7rem center;
+    }
+
+    .origin.in-drawer { margin: 0 0 1rem; }
+
+    .med-box { margin: 0 0 1.25rem; padding: 0.9rem 1rem; background: var(--mist); border-radius: 0.8rem; font-size: 0.93rem; line-height: 1.45; }
+    .med-box .pill { margin-bottom: 0.5rem; }
+    .med-box p { margin: 0 0 0.5rem; }
+    .med-box ul { margin: 0.25rem 0 0; padding-left: 1.1rem; }
+    .med-box li { margin-bottom: 0.3rem; }
+    .med-box a { color: var(--teal-deep); font-weight: 600; }
+
+    details.fold { margin: 0.6rem 0 0; font-size: 0.93rem; }
+    details.fold summary { cursor: pointer; font-weight: 600; color: var(--teal-deep); padding: 0.2rem 0; }
+    details.fold ul { margin: 0.4rem 0 0; padding-left: 1.1rem; }
+    details.fold li { margin-bottom: 0.25rem; }
+    details.fold p { margin: 0.5rem 0 0; color: var(--slate); }
+    .callout details.fold { margin-top: 0.7rem; }
+
+    .item-action { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.9rem; padding: 0 0.25rem 1rem 2.9rem; margin-top: -0.35rem; }
+
+    .stay-link {
+      display: inline-flex; align-items: center; gap: 0.45rem; padding: 0.5rem 1rem;
+      font-size: 0.95rem; font-weight: 700; color: var(--paper); background: var(--teal);
+      border-radius: 999px; text-decoration: none; transition: background-color 0.15s ease;
+    }
+
+    .stay-link:hover { background: var(--teal-deep); }
+    .stay-link svg { width: 0.95rem; height: 0.95rem; }
+    .stay-note { font-size: 0.93rem; font-weight: 600; color: var(--teal-deep); }
+    .affil { flex-basis: 100%; margin: 0; font-size: 0.82rem; color: var(--slate); }
+
+    .row.is-empty { cursor: default; opacity: 0.55; }
+    .row.is-empty:hover { background: transparent; }
+
+    /* Drawer */
+    .scrim {
+      position: fixed; inset: 0; z-index: 20; background: rgba(14, 36, 56, 0.5);
+      opacity: 0; visibility: hidden; transition: opacity 0.25s ease, visibility 0.25s;
+    }
+
+    .scrim.open { opacity: 1; visibility: visible; }
+
+    .drawer {
+      position: fixed; top: 0; right: 0; bottom: 0; z-index: 30;
+      width: min(34rem, 100%); overflow-y: auto;
+      background: var(--paper);
+      box-shadow: -24px 0 48px -28px rgba(14, 36, 56, 0.5);
+      transform: translateX(100%); visibility: hidden;
+      transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.25, 1), visibility 0.3s;
+    }
+
+    .drawer.open { transform: none; visibility: visible; }
+
+    .drawer-in { padding: 1.5rem 1.6rem 2.5rem; }
+
+    .drawer-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 1rem; }
+
+    .close {
+      flex: none; width: 2.6rem; height: 2.6rem; display: grid; place-items: center;
+      background: var(--mist); border: 0; border-radius: 50%;
+    }
+
+    .close svg { width: 1.1rem; height: 1.1rem; }
+
+    .d-title { margin: 0; font-size: 1.9rem; line-height: 1.05; font-weight: 800; font-stretch: 85%; letter-spacing: -0.03em; }
+    .d-sub { margin: 0.35rem 0 0; font-size: 0.98rem; color: var(--slate); }
+
+    .links { display: flex; flex-wrap: wrap; gap: 0.4rem 1.25rem; margin: 1rem 0 1.25rem; font-size: 0.95rem; }
+    .links a { color: var(--teal-deep); font-weight: 600; }
+
+    .meter { margin: 0 0 1.25rem; }
+    .meter-text { display: flex; justify-content: space-between; margin-bottom: 0.4rem; font-size: 0.95rem; font-weight: 600; }
+    .meter-bar { height: 0.55rem; background: var(--mist); border-radius: 999px; overflow: hidden; }
+    .meter-fill { height: 100%; width: 0; background: var(--teal); border-radius: 999px; transition: width 0.3s ease; }
+
+    .checks { list-style: none; margin: 0; padding: 0; border-top: 1.5px dashed var(--line); }
+    .checks li { border-bottom: 1.5px dashed var(--line); }
+
+    .check { display: grid; grid-template-columns: 1.75rem 1fr; gap: 0.9rem; padding: 0.95rem 0.25rem; cursor: pointer; }
+
+    .check input { position: absolute; opacity: 0; width: 1.75rem; height: 1.75rem; margin: 0; cursor: pointer; }
+
+    .box {
+      width: 1.75rem; height: 1.75rem; display: grid; place-items: center;
+      border: 2px solid #8AA3AF; border-radius: 0.5rem; background: var(--paper);
+      transition: background-color 0.12s ease, border-color 0.12s ease;
+    }
+
+    .box svg { width: 1rem; height: 1rem; opacity: 0; color: var(--paper); }
+
+    .check input:checked + .box { background: var(--teal); border-color: var(--teal); }
+    .check input:checked + .box svg { opacity: 1; }
+    .check input:focus-visible + .box { outline: 3px solid var(--ink); outline-offset: 2px; }
+
+    .check-txt strong { display: block; font-size: 1.02rem; line-height: 1.3; }
+    .check-txt small { display: block; margin-top: 0.15rem; font-size: 0.93rem; line-height: 1.4; color: var(--slate); }
+    .check input:checked ~ .check-txt strong { text-decoration: line-through; text-decoration-color: #8AA3AF; color: var(--slate); }
+
+    .cta { margin-top: 1.5rem; }
+
+    .take {
+      width: 100%; height: 3.5rem; display: flex; align-items: center; justify-content: center; gap: 0.6rem;
+      font-size: 1.1rem; font-weight: 700; color: var(--paper); background: var(--teal);
+      border: 0; border-radius: 0.8rem; transition: background-color 0.15s ease;
+    }
+
+    .take svg { width: 1.3rem; height: 1.3rem; }
+    .take:hover:not(:disabled) { background: var(--teal-deep); }
+    .take:disabled { background: #B8C8CF; color: #4C6272; cursor: not-allowed; }
+
+    .cta-note { margin: 0.6rem 0 0; font-size: 0.93rem; color: var(--slate); text-align: center; }
+    .caveat { margin: 1.5rem 0 0; font-size: 0.9rem; color: var(--slate); }
+
+    /* Flight step */
+    .ticket { margin: 1.25rem 0; background: var(--ink); color: var(--paper); border-radius: 1rem; padding: 1.2rem 1.3rem; }
+    .legs { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 0.75rem; align-items: end; }
+    .leg-label { display: block; font-size: 0.8rem; color: var(--sky); }
+    .code { display: block; font-size: 2.2rem; font-weight: 800; font-stretch: 85%; line-height: 1.05; letter-spacing: -0.02em; }
+    .code.muted { color: #7E97A6; }
+    .leg-name { display: block; font-size: 0.9rem; color: var(--sky); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .legs svg { width: 1.7rem; height: 1.7rem; margin-bottom: 1.1rem; color: var(--amber); }
+
+    .field { display: flex; flex-direction: column; gap: 0.35rem; margin-bottom: 1rem; }
+    .field label { font-size: 0.92rem; font-weight: 600; }
+
+    .field input {
+      height: 3.2rem; padding: 0 1rem; font-size: 1.05rem; background: var(--paper);
+      border: 1.5px solid #9DB5BF; border-radius: 0.65rem;
+    }
+
+    .field input.upper { text-transform: uppercase; letter-spacing: 0.04em; }
+    .error { margin: 0 0 1rem; font-size: 0.93rem; color: #9A3B2B; }
+
+    .searching { margin-top: 1.25rem; padding: 1rem 1.1rem; background: var(--tint); border-radius: 0.8rem; font-size: 0.97rem; }
+    .searching p { margin: 0; }
+    .searching a { color: var(--teal-deep); font-weight: 600; }
+
+    .track { position: relative; height: 1.6rem; margin: 0.75rem 0 0.25rem; border-bottom: 2px dashed #8AB6BF; overflow: hidden; }
+    .track svg { position: absolute; bottom: -0.15rem; left: 0; width: 1.5rem; height: 1.5rem; color: var(--teal-deep); animation: fly 2.4s ease-in-out infinite; }
+    @keyframes fly { from { left: -1.5rem; } to { left: 100%; } }
+
+    @media (max-width: 700px) {
+      .row { grid-template-columns: 1fr auto; gap: 0.4rem 1rem; }
+      .row-tag { grid-column: 1; grid-row: 2; }
+      .row-count { grid-column: 2; grid-row: 1; }
+      .search { padding-left: 1rem; }
+      .search .go { padding: 0 1.1rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .screen, .drawer, .scrim, .meter-fill, .uni, .swap > * { animation: none; transition: none; }
+      .track svg { animation: none; left: 45%; }
+    }
+  </style>
+</head>
+<body data-screen="home">
+  <div class="page">
+    <header class="bar">
+      <a class="logo" href="#/" aria-label="Ontofy home">
+        <span class="logo-mark" aria-hidden="true"></span>
+        Ontofy
+      </a>
+    </header>
+    <main id="app" tabindex="-1"></main>
+  </div>
+
+  <div class="scrim" id="scrim"></div>
+  <aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="d-title" inert>
+    <div class="drawer-in" id="drawer-in"></div>
+  </aside>
+
+  <noscript><p style="padding:2rem">Ontofy needs JavaScript to run.</p></noscript>
+
+  <script>
+    // ---------------------------------------------------------------
+    // Settings
+    // ---------------------------------------------------------------
+    // Your Travelpayouts partner marker. Flight searches carry it so
+    // bookings can be tracked to you.
+    var MARKER = 'YOUR_MARKER';
+
+    // Affiliate link shown on the housing requirement. It opens in a new tab,
+    // so the requirements page stays open and waiting. HOUSING_AFFILIATE
+    // controls the affiliate notice and the "sponsored" link attribute.
+    var HOUSING_URL = 'https://kiwi.tpx.lv/m5yeqlcO';
+    var HOUSING_AFFILIATE = true;
+    var HOUSING_LABEL = 'Find a place to stay';
+
+
+    // Subject areas. Each university lists the areas it offers, as letters.
+    var AREAS = [
+      { id: 'M', label: 'Medicine and health', chip: 'Medicine',
+        words: ['medicine', 'medical', 'medicina', 'medico', 'doctor', 'physician', 'surgery', 'nursing', 'enfermeria', 'dentistry', 'dental', 'odontologia', 'pharmacy', 'farmacia', 'health', 'health sciences', 'salud', 'biomedicine'] },
+      { id: 'E', label: 'Engineering', chip: 'Engineering',
+        words: ['engineering', 'engineer', 'ingenieria', 'ingeniero', 'mechanical', 'electrical', 'civil', 'aerospace', 'robotics', 'mecanica', 'electrica', 'mechatronics'] },
+      { id: 'C', label: 'Computer science and IT', chip: 'Computer science',
+        words: ['computer science', 'computer', 'computing', 'software', 'software engineering', 'computer engineering', 'informatics', 'informatica', 'computacion', 'programming', 'data science', 'ciencia de datos', 'artificial intelligence', 'inteligencia artificial', 'machine learning', 'cybersecurity', 'ciberseguridad', 'information technology', 'sistemas'] },
+      { id: 'A', label: 'Architecture', chip: 'Architecture',
+        words: ['architecture', 'architect', 'arquitectura', 'arquitecto', 'urban planning', 'urbanismo'] },
+      { id: 'B', label: 'Business and economics', chip: 'Business',
+        words: ['business', 'negocios', 'management', 'administracion', 'economics', 'economia', 'finance', 'finanzas', 'marketing', 'accounting', 'contabilidad', 'mba', 'entrepreneurship'] },
+      { id: 'L', label: 'Law', chip: 'Law',
+        words: ['law', 'derecho', 'legal', 'juridico', 'abogado', 'lawyer'] },
+      { id: 'D', label: 'Design and arts', chip: 'Design',
+        words: ['design', 'diseno', 'art', 'arts', 'arte', 'fine art', 'animation', 'animacion', 'graphic', 'fashion', 'moda', 'film', 'cine'] },
+      { id: 'S', label: 'Natural sciences', chip: 'Natural sciences',
+        words: ['science', 'sciences', 'natural sciences', 'ciencias', 'physics', 'fisica', 'chemistry', 'quimica', 'mathematics', 'math', 'maths', 'matematicas', 'geology', 'astronomy', 'statistics', 'estadistica'] },
+      { id: 'O', label: 'Social sciences', chip: 'Social sciences',
+        words: ['social', 'social sciences', 'political science', 'psychology', 'psicologia', 'sociology', 'sociologia', 'politics', 'international relations', 'relaciones internacionales', 'anthropology', 'antropologia', 'communication', 'comunicacion', 'journalism', 'periodismo', 'education', 'educacion'] },
+      { id: 'H', label: 'Humanities', chip: 'Humanities',
+        words: ['humanities', 'humanidades', 'history', 'historia', 'philosophy', 'filosofia', 'literature', 'literatura', 'languages', 'idiomas', 'linguistics', 'linguistica', 'theology', 'archaeology', 'arqueologia', 'music', 'musica'] },
+      { id: 'F', label: 'Life sciences and environment', chip: 'Life sciences',
+        words: ['life sciences', 'biology', 'biologia', 'agriculture', 'agricultura', 'environment', 'environmental', 'medio ambiente', 'ecology', 'ecologia', 'food', 'alimentos', 'forestry', 'biotechnology', 'biotecnologia', 'veterinary', 'veterinaria', 'genetics', 'genetica'] }
+    ];
+
+    // Notes for other subject and country pairs.
+    var NOTES = {
+      'uk:L': 'Some UK law courses ask for the LNAT, an aptitude test rather than a test of what you have studied. We have not checked which of these universities use it, so check each course page.'
+    };
+
+    // Short notes shown when the subject is medicine, because language of
+    // instruction and selection rules differ a lot between countries.
+    var MED = {
+      uk: { pill: 'Taught in English', note: 'UK medicine is taught in English but very competitive. Several of these universities require the UCAT admissions test and an interview. The registration deadline for the 2026 UCAT cycle was 16 September 2026 and has passed, so check ucat.ac.uk for the next cycle. UCAT results are valid for one year only. Start with the UCAT, and make sure Chemistry, and usually Biology, are among your school subjects. LSE, which is in our list, does not offer medicine. Requirement details were checked on 3 October 2026, and each card shows how complete they are.' },
+      nl: { pill: 'Taught in Dutch', note: 'Medicine in the Netherlands is taught in Dutch. Places are capped (numerus clausus), so a strong diploma does not guarantee a place, and the cap can differ by campus. English-language tracks have been closing, so check the language rules before you plan.' },
+      fi: { pill: 'Taught in Finnish or Swedish', note: 'Medicine and dentistry in Finland are taught in Finnish or Swedish. For English-taught options, look at biomedical and health programmes, mostly at master\'s level.' },
+      be: { pill: 'Taught in Dutch or French', note: 'Medicine in Belgium is taught in Dutch or French and has a selection procedure for entry.' },
+      es: { pill: 'Mostly taught in Spanish', note: 'Medicine in Spain is mostly taught in Spanish, and entry depends on a very high admission mark. Check the language of instruction and the requirements of each university.' },
+      fr: { pill: 'Taught in French', note: 'Medicine in France is taught in French and entry is very selective. Expect to need strong French (DELF, DALF or TCF).' },
+      de: { pill: 'Taught in German', note: 'Medicine in Germany is taught in German, with limited places and its own application route. Expect to need advanced German (for example TestDaF or DSH).' },
+      us: { pill: 'Graduate degree', note: 'In the United States, medicine is a graduate degree: you first complete a bachelor\'s degree (often called pre-med) and then apply to medical school. Check each school\'s policy for international applicants.' },
+      ca: { pill: 'Graduate degree', note: 'In Canada, medicine is also a graduate-entry degree after a bachelor\'s. Many medical schools prioritise or only accept Canadian citizens and permanent residents, so check each school\'s policy.' },
+      cn: { pill: 'English or Chinese', note: 'Several Chinese universities teach medicine to international students in English (MBBS), while others require Chinese (HSK). Check that the degree will be recognised in the country where you want to practise.' },
+      dk: { pill: 'Mostly taught in Danish', note: 'Medicine degrees in Denmark are mostly taught in Danish. For English-taught options, look at health-science programmes.' }
+    };
+
+    // ---------------------------------------------------------------
+    // Data: leading universities per country, listed in rough order of
+    // prominence. "a" = subject areas offered (letters from AREAS).
+    // Descriptions are short and general. Requirements are a starting
+    // checklist and must be confirmed on the official sites.
+    // ---------------------------------------------------------------
+    var COUNTRIES = [
+      {
+        id: 'uk', name: 'United Kingdom', tag: 'You need a CAS from your university to get a student visa',
+        portal: { label: 'UCAS', url: 'https://www.ucas.com' },
+        unis: [
+          { id: 'oxford', name: 'University of Oxford', city: 'Oxford', hub: 'London', code: 'LON', url: 'https://www.ox.ac.uk', a: 'MECBLSOHF',
+            desc: 'One of the oldest universities in the world. Teaching is built around colleges and small-group tutorials.',
+            extra: [{ t: 'Admissions test and interview', h: 'Many courses require a written test and an interview. Check your course page.' }] },
+          { id: 'cambridge', name: 'University of Cambridge', city: 'Cambridge', hub: 'London', code: 'LON', url: 'https://www.cam.ac.uk', a: 'MECABLSOHF',
+            desc: 'A collegiate research university with strengths in sciences, engineering and the humanities.',
+            extra: [{ t: 'Admissions assessment and interview', h: 'Many courses use a pre-interview assessment and interviews. Check your course page.' }] },
+          { id: 'imperial', name: 'Imperial College London', city: 'London', hub: 'London', code: 'LON', url: 'https://www.imperial.ac.uk', a: 'MECBSF',
+            desc: 'Focused on science, engineering, medicine and business, with a strong research profile.',
+            extra: [{ t: 'Department requirements', h: 'Some departments ask for a test, interview or portfolio. Check your course page.' }] },
+          { id: 'ucl', name: 'UCL', city: 'London', hub: 'London', code: 'LON', url: 'https://www.ucl.ac.uk', a: 'MECABLDSOHF',
+            desc: 'A large multidisciplinary research university in central London, with programmes across most fields.' },
+          { id: 'edinburgh', name: 'University of Edinburgh', city: 'Edinburgh', hub: 'Edinburgh', code: 'EDI', url: 'https://www.ed.ac.uk', a: 'MECABLDSOHF',
+            desc: 'A historic university in the Scottish capital, strong in humanities, sciences and informatics.' },
+          { id: 'kcl', name: 'King\'s College London', city: 'London', hub: 'London', code: 'LON', url: 'https://www.kcl.ac.uk', a: 'MECBLSOHF',
+            desc: 'A research university in central London, particularly known for health sciences, law and the humanities.' },
+          { id: 'lse', name: 'London School of Economics (LSE)', city: 'London', hub: 'London', code: 'LON', url: 'https://www.lse.ac.uk', a: 'BLOHS',
+            desc: 'Specialises in the social sciences: economics, politics, law and management.' },
+          { id: 'manchester', name: 'University of Manchester', city: 'Manchester', hub: 'Manchester', code: 'MAN', url: 'https://www.manchester.ac.uk', a: 'MECABLSOHF',
+            desc: 'One of the UK\'s largest universities, with a broad range from engineering and medicine to the arts.' },
+          { id: 'glasgow', name: 'University of Glasgow', city: 'Glasgow', hub: 'Glasgow', code: 'GLA', url: 'https://www.gla.ac.uk', a: 'MECBLSOHF',
+            desc: 'A historic Scottish university with strengths in medicine, veterinary science, humanities and sciences.' },
+          { id: 'bristol', name: 'University of Bristol', city: 'Bristol', hub: 'Bristol', code: 'BRS', url: 'https://www.bristol.ac.uk', a: 'MECBLSOHF',
+            desc: 'A research-intensive university in a lively city in the south west of England.' }
+        ]
+      },
+      {
+        id: 'nl', eu: true, name: 'Netherlands', tag: 'You apply through Studielink, then the university portal',
+        portal: { label: 'Studielink', url: 'https://www.studielink.nl' },
+        unis: [
+          { id: 'uva', name: 'University of Amsterdam', city: 'Amsterdam', hub: 'Amsterdam', code: 'AMS', url: 'https://www.uva.nl', a: 'MCBLSOH',
+            desc: 'A large research university in the city centre with many English-taught programmes.',
+            extra: [
+              { t: 'Diploma check', h: 'Use the university\'s diploma calculator to see whether your qualification meets the entry requirements.' },
+              { t: 'Application fee for bachelor\'s programmes', h: 'English-taught bachelor\'s applicants with an international diploma pay a non-refundable fee.' }
+            ] },
+          { id: 'delft', name: 'Delft University of Technology', city: 'Delft', hub: 'Amsterdam', code: 'AMS', url: 'https://www.tudelft.nl', a: 'EACDS',
+            desc: 'The Netherlands\' leading technical university, covering engineering, architecture and applied sciences.' },
+          { id: 'utrecht', name: 'Utrecht University', city: 'Utrecht', hub: 'Amsterdam', code: 'AMS', url: 'https://www.uu.nl', a: 'MCBLSOHF',
+            desc: 'A research-intensive university known for interdisciplinary teaching, in a compact student city.',
+            extra: [{ t: 'Check for limited places', h: 'Some programmes have a limited number of places and a selection procedure.' }] },
+          { id: 'leiden', name: 'Leiden University', city: 'Leiden', hub: 'Amsterdam', code: 'AMS', url: 'https://www.universiteitleiden.nl', a: 'MCLSOHF',
+            desc: 'The oldest university in the country, with strengths in law, humanities and sciences.' },
+          { id: 'wageningen', name: 'Wageningen University & Research', city: 'Wageningen', hub: 'Amsterdam', code: 'AMS', url: 'https://www.wur.nl', a: 'FSO',
+            desc: 'A specialist in life sciences, food, agriculture and the environment.' },
+          { id: 'erasmus', name: 'Erasmus University Rotterdam', city: 'Rotterdam', hub: 'Amsterdam', code: 'AMS', url: 'https://www.eur.nl', a: 'MBLOH',
+            desc: 'Known for business, economics, law and health, in the port city of Rotterdam.' },
+          { id: 'groningen', name: 'University of Groningen', city: 'Groningen', hub: 'Amsterdam', code: 'AMS', url: 'https://www.rug.nl', a: 'MECBLSOHF',
+            desc: 'A large research university in the north, in a very student-oriented city.' },
+          { id: 'vu', name: 'Vrije Universiteit Amsterdam', city: 'Amsterdam', hub: 'Amsterdam', code: 'AMS', url: 'https://vu.nl', a: 'MCBLSOHF',
+            desc: 'A research university in Amsterdam with programmes in sciences, health, law and business.' },
+          { id: 'tue', name: 'Eindhoven University of Technology', city: 'Eindhoven', hub: 'Amsterdam', code: 'AMS', url: 'https://www.tue.nl', a: 'EACDS',
+            desc: 'A technical university in the Brainport region, strong in engineering, design and industry links.' },
+          { id: 'maastricht', name: 'Maastricht University', city: 'Maastricht', hub: 'Amsterdam', code: 'AMS', url: 'https://www.maastrichtuniversity.nl', a: 'MCBLOHS',
+            desc: 'Known for problem-based learning and a very international student body.' }
+        ]
+      },
+      {
+        id: 'fi', eu: true, name: 'Finland', tag: 'You apply through Studyinfo, with a fee for non-EU/EEA applicants',
+        portal: { label: 'Studyinfo', url: 'https://studyinfo.fi' },
+        unis: [
+          { id: 'helsinki', name: 'University of Helsinki', city: 'Helsinki', hub: 'Helsinki', code: 'HEL', url: 'https://www.helsinki.fi', a: 'MCLSOHF',
+            desc: 'Finland\'s oldest and largest university, with a very broad range of disciplines.' },
+          { id: 'aalto', name: 'Aalto University', city: 'Espoo', hub: 'Helsinki', code: 'HEL', url: 'https://www.aalto.fi', a: 'ECABDS',
+            desc: 'Brings technology, business and art and design together on one campus near Helsinki.' },
+          { id: 'turku', name: 'University of Turku', city: 'Turku', hub: 'Turku', code: 'TKU', url: 'https://www.utu.fi', a: 'MCBLSOHF',
+            desc: 'A multidisciplinary university in Finland\'s former capital on the southwest coast.' },
+          { id: 'tampere', name: 'Tampere University', city: 'Tampere', hub: 'Tampere', code: 'TMP', url: 'https://www.tuni.fi', a: 'MECABSOH',
+            desc: 'Combines engineering, health sciences and social sciences in one of Finland\'s big student cities.' },
+          { id: 'oulu', name: 'University of Oulu', city: 'Oulu', hub: 'Oulu', code: 'OUL', url: 'https://www.oulu.fi', a: 'MECABSOHF',
+            desc: 'The research university of northern Finland, known for technology and Arctic topics.' },
+          { id: 'uef', name: 'University of Eastern Finland', city: 'Kuopio and Joensuu', hub: 'Helsinki', code: 'HEL', url: 'https://www.uef.fi', a: 'MCBLSOHF',
+            desc: 'A multidisciplinary university with campuses in Joensuu and Kuopio, in eastern Finland.' },
+          { id: 'jyu', name: 'University of Jyväskylä', city: 'Jyväskylä', hub: 'Helsinki', code: 'HEL', url: 'https://www.jyu.fi', a: 'CBSOHF',
+            desc: 'A university in central Finland known for education, sport sciences, IT and the humanities.' },
+          { id: 'lut', name: 'LUT University', city: 'Lappeenranta', hub: 'Helsinki', code: 'HEL', url: 'https://www.lut.fi', a: 'ECBS',
+            desc: 'A technology and business university focused on energy, sustainability and industry.' },
+          { id: 'abo', name: 'Åbo Akademi University', city: 'Turku', hub: 'Turku', code: 'TKU', url: 'https://www.abo.fi', a: 'ECBSOHF',
+            desc: 'A Swedish-language university in Turku with a range of English-taught programmes.' },
+          { id: 'hanken', name: 'Hanken School of Economics', city: 'Helsinki', hub: 'Helsinki', code: 'HEL', url: 'https://www.hanken.fi', a: 'B',
+            desc: 'A specialist business school teaching in English and Swedish.' }
+        ]
+      },
+      {
+        id: 'be', eu: true, name: 'Belgium', tag: 'Dutch-speaking and French-speaking systems, many English programmes',
+        portal: { label: 'Study in Belgium', url: 'https://www.studyinbelgium.be' },
+        unis: [
+          { id: 'kuleuven', name: 'KU Leuven', city: 'Leuven', hub: 'Brussels', code: 'BRU', url: 'https://www.kuleuven.be', a: 'MECABLSOHF',
+            desc: 'A large, research-intensive university in a historic student town near Brussels.',
+            extra: [{ t: 'Online diploma check', h: 'KU Leuven checks whether your degree is equivalent in its application portal. See the checklist for your programme.' }] },
+          { id: 'ghent', name: 'Ghent University', city: 'Ghent', hub: 'Brussels', code: 'BRU', url: 'https://www.ugent.be', a: 'MECABLSOHF',
+            desc: 'A large public research university in a lively medieval city.',
+            extra: [
+              { t: 'Online diploma check', h: 'Ghent checks your qualification through its own online application system. See your programme page.' },
+              { t: 'Admission route to the bachelor', h: 'Ghent admits you directly with a diploma on its list. Otherwise it asks for at least 60 ECTS of passed university study. Check whether your diploma is on the list.' }
+            ] },
+          { id: 'uclouvain', name: 'UCLouvain', city: 'Louvain-la-Neuve', hub: 'Brussels', code: 'BRU', url: 'https://uclouvain.be', a: 'MECABLSOHF',
+            desc: 'A French-speaking university based in a purpose-built university town.' },
+          { id: 'vub', name: 'Vrije Universiteit Brussel (VUB)', city: 'Brussels', hub: 'Brussels', code: 'BRU', url: 'https://www.vub.be', a: 'MECBLSOHF',
+            desc: 'A Dutch-language university in Brussels with a growing number of English-taught programmes.',
+            extra: [{ t: 'English: IELTS 6.5 overall, 6.0 in each part', h: 'VUB\'s published English rule. Check whether your programme sets a different level.' }] },
+          { id: 'ulb', name: 'Université libre de Bruxelles (ULB)', city: 'Brussels', hub: 'Brussels', code: 'BRU', url: 'https://www.ulb.be', a: 'MECABLDSOHF',
+            desc: 'A French-speaking university in Brussels with a strong international community.' },
+          { id: 'antwerp', name: 'University of Antwerp', city: 'Antwerp', hub: 'Brussels', code: 'BRU', url: 'https://www.uantwerpen.be', a: 'MECABLDSOHF',
+            desc: 'A Flemish university in the port city of Antwerp, offering programmes across many fields.' },
+          { id: 'uliege', name: 'University of Liège', city: 'Liège', hub: 'Brussels', code: 'BRU', url: 'https://www.uliege.be', a: 'MECABLSOHF',
+            desc: 'A French-speaking university in Wallonia with a broad range of programmes.' },
+          { id: 'uhasselt', name: 'Hasselt University', city: 'Hasselt', hub: 'Brussels', code: 'BRU', url: 'https://www.uhasselt.be', a: 'MECABLDSF',
+            desc: 'A mid-sized Flemish university in Limburg, close to the Dutch and German borders.' }
+        ]
+      },
+      {
+        id: 'dk', eu: true, name: 'Denmark', tag: 'Non-EU/EEA students pay an application fee and tuition',
+        portal: { label: 'Study in Denmark', url: 'https://studyindenmark.dk' },
+        unis: [
+          { id: 'copenhagen', name: 'University of Copenhagen', city: 'Copenhagen', hub: 'Copenhagen', code: 'CPH', url: 'https://www.ku.dk', a: 'MCBLSOHF',
+            desc: 'Denmark\'s oldest and largest university, known for research across sciences and humanities.',
+            extra: [{ t: 'Check the non-EU/EEA deadline', h: 'Deadlines for non-EU/EEA applicants can be earlier than for EU applicants.' }] },
+          { id: 'dtu', name: 'Technical University of Denmark (DTU)', city: 'Kongens Lyngby', hub: 'Copenhagen', code: 'CPH', url: 'https://www.dtu.dk', a: 'ECDSF',
+            desc: 'The country\'s technical university, focused on engineering and natural sciences.' },
+          { id: 'aarhus', name: 'Aarhus University', city: 'Aarhus', hub: 'Aarhus', code: 'AAR', url: 'https://www.au.dk', a: 'MECBLSOHF',
+            desc: 'A large research university in Denmark\'s second city, with programmes across most fields.' },
+          { id: 'aalborg', name: 'Aalborg University', city: 'Aalborg', hub: 'Aalborg', code: 'AAL', url: 'https://www.aau.dk', a: 'MECABDSOHF',
+            desc: 'Known for project-based, problem-driven learning, especially in engineering and technology.' },
+          { id: 'sdu', name: 'University of Southern Denmark (SDU)', city: 'Odense', hub: 'Copenhagen', code: 'CPH', url: 'https://www.sdu.dk', a: 'MECBLDSOHF',
+            desc: 'A broad university with its main campus in Odense, on the island of Funen.' },
+          { id: 'cbs', name: 'Copenhagen Business School (CBS)', city: 'Copenhagen', hub: 'Copenhagen', code: 'CPH', url: 'https://www.cbs.dk', a: 'BLO',
+            desc: 'Denmark\'s leading business school, with many English-taught programmes.' },
+          { id: 'itu', name: 'IT University of Copenhagen', city: 'Copenhagen', hub: 'Copenhagen', code: 'CPH', url: 'https://en.itu.dk', a: 'CDB',
+            desc: 'A university specialising in IT: computer science, digital design and business.' },
+          { id: 'ruc', name: 'Roskilde University', city: 'Roskilde', hub: 'Copenhagen', code: 'CPH', url: 'https://ruc.dk', a: 'CSOH',
+            desc: 'Known for project-based, interdisciplinary study across social sciences, humanities and sciences.' },
+          { id: 'rda', name: 'Royal Danish Academy', city: 'Copenhagen', hub: 'Copenhagen', code: 'CPH', url: 'https://royaldanishacademy.com', a: 'AD',
+            desc: 'A leading institution for architecture, design and conservation.' }
+        ]
+      },
+      {
+        id: 'es', name: 'Spain', eu: true, tag: 'Non-EU students need their qualification recognised before enrolling',
+        portal: { label: 'UNEDasiss', url: 'https://unedasiss.uned.es' },
+        unis: [
+          { id: 'ub', name: 'University of Barcelona', city: 'Barcelona', hub: 'Barcelona', code: 'BCN', url: 'https://www.ub.edu', a: 'MCBLDSOHF',
+            desc: 'A large public university in Barcelona with programmes across most fields, including medicine and the arts.' },
+          { id: 'uam', name: 'Autonomous University of Madrid', city: 'Madrid', hub: 'Madrid', code: 'MAD', url: 'https://www.uam.es', a: 'MECBLSOHF',
+            desc: 'A public research university on the northern edge of Madrid, with programmes in sciences, humanities and health.' },
+          { id: 'ucm', name: 'Complutense University of Madrid', city: 'Madrid', hub: 'Madrid', code: 'MAD', url: 'https://www.ucm.es', a: 'MCBLDSOHF',
+            desc: 'One of Spain\'s oldest and largest universities, with a very broad range of faculties.' },
+          { id: 'upf', name: 'Pompeu Fabra University', city: 'Barcelona', hub: 'Barcelona', code: 'BCN', url: 'https://www.upf.edu', a: 'MECBLSOHF',
+            desc: 'A public university in Barcelona known for social sciences, economics, communication and technology.' },
+          { id: 'upm', name: 'Technical University of Madrid (UPM)', city: 'Madrid', hub: 'Madrid', code: 'MAD', url: 'https://www.upm.es', a: 'ECASF',
+            desc: 'A leading technical university in Madrid, covering engineering, architecture and applied sciences.' },
+          { id: 'valencia', name: 'University of Valencia', city: 'Valencia', hub: 'Valencia', code: 'VLC', url: 'https://www.uv.es', a: 'MECBLSOHF',
+            desc: 'A large public university with a long history and campuses across Valencia.' },
+          { id: 'upc', name: 'Polytechnic University of Catalonia (UPC)', city: 'Barcelona', hub: 'Barcelona', code: 'BCN', url: 'https://www.upc.edu', a: 'ECADS',
+            desc: 'A technical university in Catalonia focused on engineering, architecture and design.' },
+          { id: 'navarra', name: 'University of Navarra', city: 'Pamplona', hub: 'Madrid', code: 'MAD', url: 'https://www.unav.edu', a: 'MECABLSOHF',
+            desc: 'A private university in Pamplona with programmes from medicine to architecture and communication.' }
+        ]
+      },
+      {
+        id: 'fr', name: 'France', eu: true, tag: 'Non-EU applicants often start on Études en France',
+        portal: { label: 'Campus France', url: 'https://www.campusfrance.org' },
+        unis: [
+          { id: 'sorbonne', name: 'Sorbonne University', city: 'Paris', hub: 'Paris', code: 'PAR', url: 'https://www.sorbonne-universite.fr', a: 'MECSOHF',
+            desc: 'A research university in Paris focused on sciences, medicine and the humanities.' },
+          { id: 'saclay', name: 'Université Paris-Saclay', city: 'Paris area', hub: 'Paris', code: 'PAR', url: 'https://www.universite-paris-saclay.fr', a: 'MECBLSF',
+            desc: 'A large research university south of Paris covering sciences, engineering, health, law and economics.' },
+          { id: 'psl', name: 'Université PSL', city: 'Paris', hub: 'Paris', code: 'PAR', url: 'https://psl.eu', a: 'ECBSOHDF',
+            desc: 'A university of selective schools in Paris, including the École normale supérieure and Dauphine.' },
+          { id: 'polytechnique', name: 'École Polytechnique', city: 'Palaiseau', hub: 'Paris', code: 'PAR', url: 'https://www.polytechnique.edu', a: 'ECBS',
+            desc: 'A leading engineering school south of Paris, with close ties to science and industry.' },
+          { id: 'sciencespo', name: 'Sciences Po', city: 'Paris', hub: 'Paris', code: 'PAR', url: 'https://www.sciencespo.fr', a: 'BLOH',
+            desc: 'A specialist in social sciences: politics, law, economics and international relations.' },
+          { id: 'uparis', name: 'Université Paris Cité', city: 'Paris', hub: 'Paris', code: 'PAR', url: 'https://u-paris.fr', a: 'MCBLSOHF',
+            desc: 'A large university in Paris combining medicine, sciences, humanities, law and economics.' },
+          { id: 'amu', name: 'Aix-Marseille University', city: 'Marseille', hub: 'Marseille', code: 'MRS', url: 'https://www.univ-amu.fr', a: 'MECBLSOHF',
+            desc: 'One of the largest French-speaking universities, spread across Aix-en-Provence and Marseille.' },
+          { id: 'lyon1', name: 'Université Claude Bernard Lyon 1', city: 'Lyon', hub: 'Lyon', code: 'LYS', url: 'https://www.univ-lyon1.fr', a: 'MECSF',
+            desc: 'A university in Lyon focused on health, sciences and technology.' },
+          { id: 'unistra', name: 'University of Strasbourg', city: 'Strasbourg', hub: 'Strasbourg', code: 'SXB', url: 'https://www.unistra.fr', a: 'MECBLSOHF',
+            desc: 'A large multidisciplinary university on the German border, with a strong European outlook.' }
+        ]
+      },
+      {
+        id: 'de', name: 'Germany', eu: true, tag: 'You apply directly or through uni-assist, depending on the university',
+        portal: { label: 'DAAD', url: 'https://www.daad.de/en/' },
+        unis: [
+          { id: 'tum', name: 'Technical University of Munich (TUM)', city: 'Munich', hub: 'Munich', code: 'MUC', url: 'https://www.tum.de', a: 'MECABSOF',
+            desc: 'A leading technical university covering engineering, natural sciences, medicine and management.' },
+          { id: 'lmu', name: 'LMU Munich', city: 'Munich', hub: 'Munich', code: 'MUC', url: 'https://www.lmu.de', a: 'MCBLSOHF',
+            desc: 'A large research university in Munich with a long tradition in humanities, law and medicine.' },
+          { id: 'heidelberg', name: 'Heidelberg University', city: 'Heidelberg', hub: 'Frankfurt', code: 'FRA', url: 'https://www.uni-heidelberg.de', a: 'MCBLSOHF',
+            desc: 'Germany\'s oldest university, founded in 1386.' },
+          { id: 'humboldt', name: 'Humboldt University of Berlin', city: 'Berlin', hub: 'Berlin', code: 'BER', url: 'https://www.hu-berlin.de', a: 'MCBLSOHF',
+            desc: 'A historic university in central Berlin, known for humanities and social sciences.' },
+          { id: 'fu', name: 'Free University of Berlin', city: 'Berlin', hub: 'Berlin', code: 'BER', url: 'https://www.fu-berlin.de', a: 'MCBLSOHF',
+            desc: 'A research university in Berlin with a wide range of disciplines.' },
+          { id: 'rwth', name: 'RWTH Aachen University', city: 'Aachen', hub: 'Cologne', code: 'CGN', url: 'https://www.rwth-aachen.de', a: 'MECABDSOH',
+            desc: 'One of Germany\'s largest technical universities, with a focus on engineering.' },
+          { id: 'kit', name: 'Karlsruhe Institute of Technology (KIT)', city: 'Karlsruhe', hub: 'Frankfurt', code: 'FRA', url: 'https://www.kit.edu', a: 'ECABSOHF',
+            desc: 'A research university in engineering, natural sciences and informatics.' },
+          { id: 'tub', name: 'Technical University of Berlin (TU Berlin)', city: 'Berlin', hub: 'Berlin', code: 'BER', url: 'https://www.tu.berlin', a: 'ECABSOH',
+            desc: 'A technical university in Berlin covering engineering, architecture and planning.' },
+          { id: 'freiburg', name: 'University of Freiburg', city: 'Freiburg', hub: 'Frankfurt', code: 'FRA', url: 'https://uni-freiburg.de', a: 'MECBLSOHF',
+            desc: 'A research university in southwest Germany, close to France and Switzerland.' },
+          { id: 'bonn', name: 'University of Bonn', city: 'Bonn', hub: 'Cologne', code: 'CGN', url: 'https://www.uni-bonn.de', a: 'MCBLSOHF',
+            desc: 'A research university on the Rhine with a long tradition in sciences and humanities.' }
+        ]
+      },
+      {
+        id: 'us', name: 'United States', tag: 'Your school issues an I-20 for your F-1 student visa',
+        portal: { label: 'EducationUSA', url: 'https://educationusa.state.gov' },
+        unis: [
+          { id: 'mit', name: 'Massachusetts Institute of Technology (MIT)', city: 'Cambridge, MA', hub: 'Boston', code: 'BOS', url: 'https://www.mit.edu', a: 'ECABSOH',
+            desc: 'A research university focused on science, engineering and technology.' },
+          { id: 'stanford', name: 'Stanford University', city: 'Stanford, CA', hub: 'San Francisco', code: 'SFO', url: 'https://www.stanford.edu', a: 'MECBLDSOHF',
+            desc: 'A private research university in Silicon Valley with close ties to technology and entrepreneurship.' },
+          { id: 'harvard', name: 'Harvard University', city: 'Cambridge, MA', hub: 'Boston', code: 'BOS', url: 'https://www.harvard.edu', a: 'MECABLDSOHF',
+            desc: 'The oldest university in the United States, with programmes across most fields.' },
+          { id: 'caltech', name: 'California Institute of Technology (Caltech)', city: 'Pasadena, CA', hub: 'Los Angeles', code: 'LAX', url: 'https://www.caltech.edu', a: 'ECSOHF',
+            desc: 'A small, science and engineering focused research university near Los Angeles.' },
+          { id: 'princeton', name: 'Princeton University', city: 'Princeton, NJ', hub: 'New York', code: 'NYC', url: 'https://www.princeton.edu', a: 'ECASOHF',
+            desc: 'A research university with a strong focus on undergraduate teaching.' },
+          { id: 'yale', name: 'Yale University', city: 'New Haven, CT', hub: 'New York', code: 'NYC', url: 'https://www.yale.edu', a: 'MECABLDSOHF',
+            desc: 'An Ivy League university in Connecticut with schools of law, drama, architecture and medicine.' },
+          { id: 'columbia', name: 'Columbia University', city: 'New York, NY', hub: 'New York', code: 'NYC', url: 'https://www.columbia.edu', a: 'MECABLDSOHF',
+            desc: 'An Ivy League university in Manhattan with a broad range of schools.' },
+          { id: 'uchicago', name: 'University of Chicago', city: 'Chicago, IL', hub: 'Chicago', code: 'CHI', url: 'https://www.uchicago.edu', a: 'MECBLSOHF',
+            desc: 'A research university known for its core curriculum and its economics and social sciences.' },
+          { id: 'berkeley', name: 'University of California, Berkeley', city: 'Berkeley, CA', hub: 'San Francisco', code: 'SFO', url: 'https://www.berkeley.edu', a: 'ECABLDSOHF',
+            desc: 'A large public research university near San Francisco.' },
+          { id: 'umich', name: 'University of Michigan', city: 'Ann Arbor, MI', hub: 'Detroit', code: 'DTW', url: 'https://umich.edu', a: 'MECABLDSOHF',
+            desc: 'A large public research university with a very broad range of programmes.' }
+        ]
+      },
+      {
+        id: 'ca', name: 'Canada', tag: 'You need an acceptance letter and a study permit',
+        portal: { label: 'EduCanada', url: 'https://www.educanada.ca' },
+        unis: [
+          { id: 'toronto', name: 'University of Toronto', city: 'Toronto', hub: 'Toronto', code: 'YTO', url: 'https://www.utoronto.ca', a: 'MECABLDSOHF',
+            desc: 'Canada\'s largest university, with three campuses and a very broad range of programmes.' },
+          { id: 'ubc', name: 'University of British Columbia (UBC)', city: 'Vancouver', hub: 'Vancouver', code: 'YVR', url: 'https://www.ubc.ca', a: 'MECABLDSOHF',
+            desc: 'A large public research university on Canada\'s west coast.' },
+          { id: 'mcgill', name: 'McGill University', city: 'Montreal', hub: 'Montreal', code: 'YMQ', url: 'https://www.mcgill.ca', a: 'MECABLSOHF',
+            desc: 'An English-language research university in Montreal, a mainly French-speaking city.' },
+          { id: 'waterloo', name: 'University of Waterloo', city: 'Waterloo', hub: 'Toronto', code: 'YTO', url: 'https://uwaterloo.ca', a: 'ECABSOHF',
+            desc: 'Known for engineering, computer science and co-operative education.' },
+          { id: 'alberta', name: 'University of Alberta', city: 'Edmonton', hub: 'Edmonton', code: 'YEG', url: 'https://www.ualberta.ca', a: 'MECBLSOHF',
+            desc: 'A large public research university in Edmonton.' },
+          { id: 'mcmaster', name: 'McMaster University', city: 'Hamilton', hub: 'Toronto', code: 'YTO', url: 'https://www.mcmaster.ca', a: 'MECBSOHF',
+            desc: 'Known for its health sciences programmes and problem-based learning.' },
+          { id: 'montreal', name: 'Université de Montréal', city: 'Montreal', hub: 'Montreal', code: 'YMQ', url: 'https://www.umontreal.ca', a: 'MECABLDSOHF',
+            desc: 'A French-language research university in Montreal.' },
+          { id: 'calgary', name: 'University of Calgary', city: 'Calgary', hub: 'Calgary', code: 'YYC', url: 'https://www.ucalgary.ca', a: 'MECABLDSOHF',
+            desc: 'A public research university in Calgary, close to the Rocky Mountains.' }
+        ]
+      },
+      {
+        id: 'cn', name: 'China', tag: 'You need a JW202 form and an X1 student visa',
+        portal: { label: 'Campus China', url: 'https://www.campuschina.org' },
+        unis: [
+          { id: 'tsinghua', name: 'Tsinghua University', city: 'Beijing', hub: 'Beijing', code: 'BJS', url: 'https://www.tsinghua.edu.cn/en/', a: 'MECABLDSOHF',
+            desc: 'One of China\'s top universities, known for engineering, science and technology.' },
+          { id: 'pku', name: 'Peking University', city: 'Beijing', hub: 'Beijing', code: 'BJS', url: 'https://english.pku.edu.cn', a: 'MECBLSOHF',
+            desc: 'One of China\'s most prominent comprehensive universities.' },
+          { id: 'fudan', name: 'Fudan University', city: 'Shanghai', hub: 'Shanghai', code: 'SHA', url: 'https://www.fudan.edu.cn/en/', a: 'MECBLSOHF',
+            desc: 'A comprehensive research university in Shanghai.' },
+          { id: 'sjtu', name: 'Shanghai Jiao Tong University', city: 'Shanghai', hub: 'Shanghai', code: 'SHA', url: 'https://en.sjtu.edu.cn', a: 'MECABLDSOHF',
+            desc: 'A comprehensive university in Shanghai with a strong engineering tradition.' },
+          { id: 'zju', name: 'Zhejiang University', city: 'Hangzhou', hub: 'Hangzhou', code: 'HGH', url: 'https://www.zju.edu.cn/english/', a: 'MECABLDSOHF',
+            desc: 'A large comprehensive university in Hangzhou covering most fields.' },
+          { id: 'ustc', name: 'University of Science and Technology of China', city: 'Hefei', hub: 'Shanghai', code: 'SHA', url: 'https://en.ustc.edu.cn', a: 'ECSF',
+            desc: 'A science and technology university in Hefei, focused on research.' },
+          { id: 'whu', name: 'Wuhan University', city: 'Wuhan', hub: 'Wuhan', code: 'WUH', url: 'https://en.whu.edu.cn', a: 'MECABLSOHF',
+            desc: 'A comprehensive university in central China.' },
+          { id: 'sysu', name: 'Sun Yat-sen University', city: 'Guangzhou', hub: 'Guangzhou', code: 'CAN', url: 'https://www.sysu.edu.cn/sysuen/', a: 'MECBLSOHF',
+            desc: 'A comprehensive university in Guangzhou, with a large medical school.' }
+        ]
+      }
+    ];
+
+    // ---------------------------------------------------------------
+    // UK medicine: requirements read from official university and UCAT
+    // pages on 3 October 2026 (research file for Estonian applicants).
+    // Nothing here is inferred. Where the source could not be read, the
+    // entry says so and the student is sent to the official page.
+    // status: verified | partial | none
+    // ---------------------------------------------------------------
+    var MEDUK_CHECKED = '3 Oct 2026';
+
+    var UCAT_FACTS = [
+      'Run by a consortium of UK and partner universities and used for medical and dental degrees. It is used alongside other selection components, not instead of them.',
+      'A computer-based test with four subtests: Verbal Reasoning, Decision Making, Quantitative Reasoning and Situational Judgement. Abstract Reasoning was withdrawn in 2025.',
+      'About 37,000 candidates sit it each year, at Pearson test centres in 5,500+ locations across 180+ countries.',
+      'An entry fee applies. A UK bursary scheme exists.',
+      '2026 cycle: booking closed on 16 September 2026 at 15:00 UK time, with no exceptions. The test window ran from 13 July to 24 September 2026.',
+      'Dates for the next cycle are not confirmed in our source. Check ucat.ac.uk.',
+      'Results are valid for one year only.',
+      'Cambridge sets no minimum score and, for 2027 entry, uses only the cognitive subtests. Manchester publishes its threshold after results arrive in November.'
+    ];
+
+    var MEDUK = {
+      glasgow: {
+        status: 'verified',
+        src: [{ l: 'Glasgow international entry requirements', u: 'https://www.gla.ac.uk/schools/medicine/mus/admissions/internationalentryrequirements/' }],
+        checks: [
+          { t: 'UCAT taken', h: 'Glasgow requires the UCAT for medicine. Sit it in the cycle before you apply.' },
+          { t: 'Chemistry, Biology and Physics or Mathematics', h: 'International A-levels: Chemistry, Biology and one of Physics or Mathematics, plus English at IGCSE grade B or 6. UK Scottish route: those subjects at Higher and National 5 English at B.' },
+          { t: 'Interview', h: 'Glasgow requires an interview. Prepare for it before you apply.' }
+        ],
+        checksEE: [
+          { t: 'UCAT taken', h: 'Glasgow requires the UCAT for medicine. Sit it in the cycle before you apply.' },
+          { t: 'Gümnaasiumi lõputunnistus with Riigieksamid', qual: true, h: 'Glasgow asks for the Estonian school-leaving certificate together with the state exams.' },
+          { t: 'Overall grade of 4.4', h: 'On the Estonian 1 to 5 scale. This is the overall grade Glasgow states for medicine.' },
+          { t: 'Three state exams at 80% or higher', h: 'None of your three state exams can be below 80%.' },
+          { t: 'Required subjects at 90%', h: 'Glasgow states that the required subjects must reach 90%. Our source reads these as Chemistry and Biology, but the three compulsory Estonian state exams are Estonian, mathematics and a foreign language. Ask Glasgow how Chemistry and Biology are assessed for Estonian applicants.' },
+          { t: 'Interview', h: 'Glasgow requires an interview. Prepare for it before you apply.' }
+        ],
+        notes: [], notesEE: [], details: []
+      },
+      cambridge: {
+        status: 'partial',
+        src: [{ l: 'Cambridge medicine course page', u: 'https://undergraduate.study.cam.ac.uk/courses/medicine-mb-bchir' }],
+        checks: [
+          { t: 'UCAT taken', h: 'Required for medicine (A100). There is no minimum score. For 2027 entry only the cognitive subtests count, not situational judgement.' },
+          { t: 'Minimum offer: A*A*A at A level, or IB 41 to 42 points', h: 'For the IB route, with 7, 7, 6 at Higher Level. Colleges may ask for higher grades.' },
+          { t: 'Chemistry plus one or two other subjects', h: 'Chemistry and one or two of Mathematics, Biology or Human Biology, Physics or Further Mathematics, depending on the College. Colleges usually require A* in Chemistry.' },
+          { t: 'College chosen deliberately', h: 'Each College sets the offer. Some ask for Chemistry plus one other subject, others plus two. See the College lists above.' },
+          { t: 'Interview preparation', h: 'No written work is needed before the interview.' },
+          { t: 'Age requirement', h: 'You must be 18 by 1 November of your first year.' }
+        ],
+        notes: [],
+        notesEE: ['Cambridge\'s country page gives an average of 5 from 5 subjects for Estonian general entry. On the Estonian scale a grade of 5 (väga hea) is 90 to 100%. We could not confirm that this figure applies to medicine, where each College sets the offer.'],
+        details: [
+          { s: 'Colleges: Chemistry plus one other subject', items: ['Fitzwilliam', 'Girton', 'Homerton', 'Murray Edwards', 'Newnham', 'Selwyn', 'Trinity Hall'] },
+          { s: 'Colleges: Chemistry plus two other subjects', items: ['Christ\'s', 'Churchill', 'Clare', 'Corpus Christi', 'Downing', 'Emmanuel', 'Gonville & Caius', 'Jesus', 'King\'s', 'Lucy Cavendish', 'Magdalene', 'Pembroke', 'Peterhouse', 'Queens\'', 'Robinson', 'Sidney Sussex', 'St Catharine\'s', 'St Edmund\'s', 'St John\'s', 'Trinity', 'Wolfson'],
+            caveat: 'Our source lists these Colleges in two groups, but its own text gives a different count for the second group. Check each College\'s page before you choose.' }
+        ]
+      },
+      imperial: {
+        status: 'partial',
+        src: [],
+        checks: [
+          { t: 'Entry grades: A*AA at A level, or IB 38 points', h: 'A level must include Chemistry and Biology, with A* in one of them.' },
+          { t: 'Entry standard for your qualification', h: 'Imperial publishes the grade standard per country. Read it for your qualification.' }
+        ],
+        checksEE: [
+          { t: 'Entry grades: A*AA at A level, or IB 38 points', h: 'A level must include Chemistry and Biology, with A* in one of them.' },
+          { t: 'Entry standard for Estonian qualifications', h: 'Imperial lists the Gümnaasiumi lõputunnistus and Riigieksamitunnistus as accepted. The exact grade standard is not confirmed in our source, so read it on Imperial\'s international page.' }
+        ],
+        notes: ['Six-year MBBS/BSc (course A100), applied for through UCAS, starting October 2027.', 'The course page lists a places ratio of 6:1 (2025). Our source does not say what the ratio measures.', 'We could not confirm Imperial\'s admissions test from our source. Check the course page.'],
+        notesEE: [], details: []
+      },
+      manchester: {
+        status: 'partial',
+        src: [],
+        checks: [
+          { t: 'UCAT taken', h: 'Required for all applicants to the five-year course (A106) and Graduate Entry (A101). The score threshold is published only after results arrive in November and changes every year.' },
+          { t: 'Situational judgement Band 1 or 2', h: 'To be interviewed you must meet the UCAT threshold and reach Band 1 or 2 in the Situational Judgement Test.' },
+          { t: 'Academic requirements for your qualification', h: 'Manchester sets minimum academic requirements. We did not capture the Estonian standard, so check it on their page.' }
+        ],
+        notes: ['If more applicants meet the threshold than there are interview places, they are ranked by UCAT total score and situational judgement band.', 'Previous thresholds are published on Manchester\'s application-data page.', 'A second application requires a new UCAT.'],
+        notesEE: [], details: []
+      },
+      edinburgh: {
+        status: 'partial',
+        src: [],
+        checks: [
+          { t: 'Chemistry plus two of Biology, Mathematics or Physics', h: 'Required at Higher. This is stated for UK qualifications; the page also shows Biology B, Chemistry B, English B and Mathematics B at Standard Grade level.' },
+          { t: 'Entry standard for your country', h: 'Edinburgh\'s international requirements sit behind a country selector and are not captured in our source. Check the standard for your qualification.' }
+        ],
+        notes: ['Only one Mathematics subject (or Applications of Mathematics) and one of Biology or Human Biology count towards the three required subjects.', 'Some subject combinations are not possible in S5; a missing science may be taken in S6.', 'Offers are conditional on your S6 (final-year) results.', 'We could not confirm Edinburgh\'s admissions test from our source.'],
+        notesEE: [], details: []
+      },
+      kcl: {
+        status: 'partial',
+        src: [],
+        checks: [
+          { t: 'UCAT taken in the same year', h: 'Required for all applicants and must be taken in the same year as your application.' },
+          { t: 'GCSE grade 6 or B in English Language and Mathematics', h: 'International applicants without GCSEs or IGCSEs are not expected to meet this, and international equivalents can be considered.' },
+          { t: 'Interview preparation', h: 'Expect an interview.' }
+        ],
+        notes: ['Estonia is not named on the entry-requirements page we read.'],
+        notesEE: [], details: []
+      },
+      oxford: {
+        status: 'none', src: [],
+        checks: [{ t: 'Read the official medicine entry requirements', h: 'We could not verify this university yet. Confirm the grades, subjects and admissions test on its own medicine page.' }],
+        notes: ['Our reader was blocked by this university\'s website, so nothing was recorded.'], notesEE: [], details: []
+      },
+      ucl: {
+        status: 'none', src: [],
+        checks: [{ t: 'Read the official medicine entry requirements', h: 'We could not verify this university yet. Confirm the grades, subjects and admissions test on its own medicine page.' }],
+        notes: ['Our reader was blocked by this university\'s website, so nothing was recorded.'], notesEE: [], details: []
+      },
+      bristol: {
+        status: 'none', src: [],
+        checks: [{ t: 'Read the official medicine entry requirements', h: 'We could not verify this university yet. Confirm the grades, subjects and admissions test on its own medicine page.' }],
+        notes: ['This university has not been covered by our research yet.'], notesEE: [], details: []
+      }
+    };
+
+    // How each system evaluates a foreign qualification. Read from official
+    // pages on 3 Oct 2026 (research foundation file).
+    var HOW = {
+      uk: {
+        items: ['UK universities publish grade thresholds per country, and Cambridge names Estonia (average of 5 from 5 subjects for general entry).', 'Requirements are set per course, not per university: a medicine offer and a history offer at the same university are different.'],
+        src: [{ l: 'Cambridge international entry requirements', u: 'https://undergraduate.study.cam.ac.uk/international-students/international-entry-requirements' }]
+      },
+      nl: {
+        items: ['Each institution sets its own admission requirements, and they can vary by programme.', 'The institution assesses your diploma with advice from Nuffic and makes the final decision.', 'Some programmes cap places (numerus clausus), notably Medicine. A strong diploma does not overcome a cap.'],
+        src: [{ l: 'Study in NL: admission requirements', u: 'https://www.studyinnl.org/plan-your-stay/admission-requirements' }, { l: 'Study in NL: checking your diploma', u: 'https://www.studyinnl.org/plan-your-stay/checking-your-diploma' }]
+      },
+      fi: {
+        items: ['Requirements are set per programme and published in Studyinfo.', 'Entrance exams, SAT or GMAT tests, or interviews are possible at programme level.', 'English test minimums vary by university and by programme.'],
+        src: [{ l: 'Study in Finland: bachelor\'s admissions', u: 'https://www.studyinfinland.fi/admissions/bachelors-and-masters-admissions' }]
+      },
+      be: {
+        items: ['Each institution sets its own academic and language requirements.', 'Example: VUB asks for IELTS 6.5 overall with 6.0 in each part for English. Ghent admits directly with a listed diploma, otherwise it asks for at least 60 ECTS of passed university study.'],
+        src: [{ l: 'VUB academic and language requirements', u: 'https://www.vub.be/en/studying-vub/apply-and-enrol-vub/admission-requirements-and-deadlines/academic-and-language-requirements' }, { l: 'Ghent: admission to a bachelor programme', u: 'https://www.ugent.be/prospect/en/administration/application/requirement/admission-bachelor' }]
+      },
+      dk: {
+        items: ['Admission is quota-based and compares your upper-secondary qualification with the Danish gymnasial level.', 'Programme-specific English requirements could not be read, so check each programme page.'],
+        src: []
+      }
+    };
+
+    var STATUS = {
+      verified: { pill: 'Verified', cls: 's-verified', line: 'Verified on ' + MEDUK_CHECKED + ' from official pages.' },
+      partial: { pill: 'Partly verified', cls: 's-partial', line: 'Partly verified on ' + MEDUK_CHECKED + '. Some details could not be read, listed below.' },
+      none: { pill: 'Not verified', cls: 's-none', line: 'Not verified yet. Use the official page.' }
+    };
+
+    // Where the applicant comes from changes which requirements and airports we show.
+    // eu: true means we treat the applicant as an EU citizen (no student visa
+    // or non-EU fees for EU destinations).
+    var ORIGINS = [
+      { id: 'XX', label: 'Another country' },
+      { id: 'CN', label: 'China' },
+      { id: 'EE', label: 'Estonia', eu: true },
+      { id: 'FI', label: 'Finland', eu: true },
+      { id: 'FR', label: 'France', eu: true },
+      { id: 'DE', label: 'Germany', eu: true },
+      { id: 'MX', label: 'Mexico' },
+      { id: 'ES', label: 'Spain', eu: true },
+      { id: 'US', label: 'United States' }
+    ];
+
+    function originIsEU(id) {
+      var o = ORIGINS.filter(function (x) { return x.id === id; })[0];
+      return !!(o && o.eu);
+    }
+
+    var AIRPORTS_BY = {
+      EE: { hint: 'TLL', list: [['TLL', 'Tallinn'], ['TAY', 'Tartu'], ['RIX', 'Riga'], ['HEL', 'Helsinki']] },
+      MX: { hint: 'MEX', list: [['MEX', 'Mexico City'], ['GDL', 'Guadalajara'], ['MTY', 'Monterrey'], ['CUN', 'Cancun'], ['TIJ', 'Tijuana'], ['PBC', 'Puebla'], ['QRO', 'Queretaro']] },
+      ES: { hint: 'MAD', list: [['MAD', 'Madrid'], ['BCN', 'Barcelona'], ['VLC', 'Valencia'], ['AGP', 'Malaga'], ['SVQ', 'Seville']] },
+      FR: { hint: 'PAR', list: [['PAR', 'Paris'], ['LYS', 'Lyon'], ['MRS', 'Marseille'], ['NCE', 'Nice'], ['TLS', 'Toulouse']] },
+      DE: { hint: 'BER', list: [['BER', 'Berlin'], ['MUC', 'Munich'], ['FRA', 'Frankfurt'], ['HAM', 'Hamburg'], ['DUS', 'Dusseldorf']] },
+      CN: { hint: 'BJS', list: [['BJS', 'Beijing'], ['SHA', 'Shanghai'], ['CAN', 'Guangzhou'], ['SZX', 'Shenzhen'], ['CTU', 'Chengdu']] },
+      US: { hint: 'NYC', list: [['NYC', 'New York'], ['LAX', 'Los Angeles'], ['CHI', 'Chicago'], ['MIA', 'Miami'], ['SFO', 'San Francisco']] },
+      FI: { hint: 'HEL', list: [['HEL', 'Helsinki'], ['TMP', 'Tampere'], ['TKU', 'Turku'], ['OUL', 'Oulu'], ['RVN', 'Rovaniemi']] },
+      XX: { hint: 'e.g. TLL', list: [['TLL', 'Tallinn'], ['MEX', 'Mexico City'], ['HEL', 'Helsinki'], ['RIX', 'Riga'], ['GDL', 'Guadalajara'], ['MTY', 'Monterrey']] }
+    };
+
+    var DEFAULT_EXTRA = [{ t: 'Programme-specific requirements', h: 'Subjects, grades or extra documents set by your programme. Check the programme page.' }];
+
+    function slug(s) { return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''); }
+
+    // Grad-entry medicine: shown instead of the programme-specific item.
+    var MEDGRAD = {
+      us: [
+        { t: 'Bachelor\'s degree first', h: 'Medicine is a graduate degree in the United States. Plan a bachelor\'s degree with pre-med courses, then apply to medical school.' },
+        { t: 'Medical admission test', h: 'Most medical schools ask for the MCAT. Check each school\'s policy for international applicants.' }
+      ],
+      ca: [
+        { t: 'Bachelor\'s degree first', h: 'Medicine is a graduate-entry degree in Canada. Plan a bachelor\'s degree first, then apply to medical school.' },
+        { t: 'International applicant policy', h: 'Many Canadian medical schools prioritise or only accept Canadian citizens and permanent residents. Check each school\'s policy before you plan.' }
+      ]
+    };
+
+    // Items marked n:true only apply to applicants who are not EU/EEA citizens.
+    function nonEU(item) { item.n = true; return item; }
+
+    // Builds the checklist for one university from its country system.
+    function buildRequirements(country, uni) {
+      var area = currentArea();
+      var origin = getOrigin();
+      var extra = uni.extra || DEFAULT_EXTRA;
+      var medUk = country.id === 'uk' && area === 'M' ? MEDUK[uni.id] : null;
+      if (medUk) extra = (origin === 'EE' && medUk.checksEE) ? medUk.checksEE : medUk.checks;
+      if (area === 'M' && MEDGRAD[country.id]) extra = MEDGRAD[country.id];
+
+      var passport = { t: 'Valid passport', h: 'Check that it stays valid for your whole stay and has free pages.' };
+      var docs = { t: 'Diplomas and transcripts ready', h: 'Your school-leaving diploma and grade transcripts, with certified translations where the university asks for them.' };
+      var housing = { t: 'Housing plan for your first weeks', h: 'Look for student housing as soon as you are admitted. Places are limited in many cities.' };
+      var list;
+
+      if (country.id === 'uk') {
+        list = [passport, docs,
+          { t: 'English test result', h: 'A Secure English Language Test accepted by UK Visas and Immigration (B2 level), unless you are exempt. Universities typically ask for IELTS 6.0 to 7.0, depending on the course.' },
+          { t: 'Application submitted', h: 'Undergraduate courses go through UCAS. Most postgraduate courses use the university\'s own portal. Include your personal statement and references.' }]
+          .concat(extra, [
+          { t: 'Unconditional offer and CAS', h: 'Once you meet all conditions, the university issues a Confirmation of Acceptance for Studies (CAS).' },
+          { t: 'Funds for the visa', h: 'Proof of tuition and living costs, held for 28 days before you apply.' },
+          { t: 'Student visa application', h: 'Apply online with your CAS. Check whether you need a tuberculosis test certificate and pay the Immigration Health Surcharge.' },
+          housing]);
+      } else if (country.id === 'nl') {
+        list = [passport, docs,
+          { t: 'English test result', h: 'IELTS, TOEFL or an equivalent at the level your programme asks for. Cambridge English (B2 First, C1 Advanced, C2 Proficiency) is among the accepted tests.' },
+          { t: 'Diploma recognised by the university', h: 'The university checks your diploma, with advice from Nuffic, and makes the final decision. That decision may differ from the Nuffic evaluation; if you disagree, go to the university, not to Nuffic.' },
+          { t: 'Studielink registration', h: 'Register in Studielink, then complete the steps in the university\'s own portal. Non-EU/EEA applicants should apply early.' }]
+          .concat(extra, [
+          { t: 'Unconditional admission offer', h: 'Wait for the university\'s decision and accept your place before the deadline.' },
+          nonEU({ t: 'Funds for the residence permit', h: 'Proof that you can cover your living costs.' }),
+          nonEU({ t: 'Residence permit', h: 'The university usually submits it to the immigration service (IND) for you. Provide the documents it asks for.' }),
+          { t: 'Housing plan for your first weeks', h: 'Student housing is very competitive in the Netherlands. Start as soon as you are admitted.' }]);
+      } else if (country.id === 'fi') {
+        list = [passport, docs,
+          { t: 'Diploma that qualifies you for higher education', h: 'A high-school diploma that gives access to higher education in your home country.' },
+          { t: 'Language test result', h: 'IELTS, TOEFL, PTE or Cambridge are commonly accepted. Minimums vary by university and by programme.' },
+          { t: 'Application in Studyinfo', h: 'The main joint application is in January for a September start, and you can list up to six programmes. A limited number of programmes open in September for a January start.' },
+          nonEU({ t: 'EUR 100 application fee paid', h: 'Non-EU/EEA applicants pay a one-time fee within 7 days of submitting, or the application is not processed.' })]
+          .concat([{ t: 'Entrance exam or selection', h: 'Some programmes use entrance exams, SAT or GMAT tests, or interviews. Check your programme in Studyinfo.' }], [
+          { t: 'Admission offer accepted', h: 'Accept your study place before the deadline. You can accept only one study place per term in Finnish higher education.' },
+          nonEU({ t: 'Tuition plan', h: 'Non-EU/EEA students usually pay tuition unless they get a waiver or scholarship.' }),
+          nonEU({ t: 'Funds for the residence permit', h: 'Proof of funds as required by the Finnish Immigration Service (Migri).' }),
+          nonEU({ t: 'Student residence permit', h: 'Apply through Enter Finland before you travel.' }),
+          { t: 'Housing plan for your first weeks', h: 'Student housing queues can be long in cities such as Helsinki, Tampere and Turku.' }]);
+      } else if (country.id === 'be') {
+        list = [passport, docs,
+          { t: 'Language proof', h: 'English, Dutch or French, depending on your programme.' },
+          { t: 'Application submitted', h: 'Apply through the university\'s own online portal. Deadlines are often earlier for non-EU applicants.' }]
+          .concat(extra, [
+          { t: 'Admission letter received', h: 'Keep it for enrolment and, if you need one, for the visa application.' },
+          nonEU({ t: 'Funds for the visa', h: 'Proof that you can cover your living costs in Belgium.' }),
+          { t: 'Health insurance', h: 'Proof of health insurance is needed for enrolment, and for the visa if you need one.' },
+          nonEU({ t: 'Type D student visa', h: 'Apply at the Belgian embassy or consulate in your home country after admission. Allow several weeks for processing.' }),
+          housing]);
+      } else if (country.id === 'dk') {
+        list = [passport, docs,
+          { t: 'Language test result', h: 'English test at the level your programme requires.' },
+          { t: 'Application submitted', h: 'Apply through the university\'s portal or optagelse.dk, as your programme specifies. Admission is quota-based and compares your upper-secondary qualification with the Danish gymnasial level.' },
+          nonEU({ t: 'Application fee paid', h: 'Non-EU/EEA applicants pay an application fee and upload the receipt with the application.' })]
+          .concat(extra, [
+          { t: 'Admission offer received', h: 'Accept your place before the deadline.' },
+          nonEU({ t: 'First tuition payment', h: 'Non-EU/EEA students pay tuition. Some universities start your residence permit only after the first instalment.' }),
+          nonEU({ t: 'Funds for the residence permit', h: 'Proof that you can cover your living costs.' }),
+          nonEU({ t: 'Student residence permit', h: 'Processed by the Danish Agency for International Recruitment and Integration (SIRI), often started by the university after admission.' }),
+          { t: 'Housing plan for your first weeks', h: 'Plan housing early. Rental portals such as BoligPortal list rooms and flats.' }]);
+      } else if (country.id === 'es') {
+        list = [passport, docs,
+          { t: 'Language proof', h: 'Proof of Spanish for Spanish-taught programmes, or of English for English-taught ones.' },
+          nonEU({ t: 'Qualification recognised', h: 'Non-EU students usually need their school-leaving qualification recognised (homologación) or an access credential from UNEDasiss. Start many months before you enrol.' }),
+          { t: 'Application submitted', h: 'Apply through the university\'s online platform, attaching your credential, transcripts and any statement or references it asks for.' }]
+          .concat(extra, [
+          { t: 'Admission letter received', h: 'Keep it for enrolment and, if you need one, for the visa application.' },
+          nonEU({ t: 'Funds for the visa', h: 'Proof that you can cover your living costs in Spain.' }),
+          nonEU({ t: 'Health insurance', h: 'Private health insurance valid in Spain is needed for the visa.' }),
+          nonEU({ t: 'Student visa (type D)', h: 'Apply at the Spanish embassy or consulate after admission.' }),
+          housing]);
+      } else if (country.id === 'fr') {
+        list = [passport, docs,
+          { t: 'Language test result', h: 'DELF, DALF or TCF for French-taught programmes, or an English test for English-taught ones.' },
+          nonEU({ t: 'Études en France registration', h: 'Non-EU applicants usually register on the Campus France platform and may be invited to an interview. Check whether your country must follow this procedure.' }),
+          { t: 'Application submitted', h: 'Apply through Parcoursup for undergraduate programmes, or through the university or school for master\'s programmes.' }]
+          .concat(extra, [
+          { t: 'Admission letter received', h: 'Keep it for enrolment and, if you need one, for the visa application.' },
+          nonEU({ t: 'Funds for the visa', h: 'Proof that you can cover your living costs in France.' }),
+          nonEU({ t: 'Health coverage', h: 'Non-EU students must show proof of health coverage as part of the visa application.' }),
+          nonEU({ t: 'Long-stay student visa (VLS-TS)', h: 'Apply at the French consulate once you are accepted, and allow several weeks for processing.' }),
+          housing]);
+      } else if (country.id === 'de') {
+        list = [passport, docs,
+          { t: 'Entrance qualification recognised', h: 'You need a school-leaving qualification that gives access to German universities. Check whether yours is recognised or whether you need a Studienkolleg preparatory course.' },
+          { t: 'Language test result', h: 'TestDaF or DSH for German-taught programmes, or IELTS or TOEFL for English-taught ones.' },
+          { t: 'Application submitted', h: 'Apply directly to the university or through uni-assist, depending on the university. Check which one yours uses.' }]
+          .concat(extra, [
+          { t: 'Admission letter (Zulassungsbescheid)', h: 'Keep it for enrolment and, if you need one, for the visa application.' },
+          nonEU({ t: 'Blocked account or other proof of funds', h: 'Non-EU students usually open a blocked account (Sperrkonto) before the visa appointment. A scholarship letter can replace it.' }),
+          nonEU({ t: 'National student visa (type D)', h: 'Apply at the German embassy after admission. Processing can take weeks, so apply as early as possible.' }),
+          housing]);
+      } else if (country.id === 'us') {
+        list = [passport, docs,
+          { t: 'English test result', h: 'TOEFL, IELTS or Duolingo, at the level each school asks for.' },
+          { t: 'SAT or ACT, if the school asks', h: 'Some schools ask undergraduate applicants for these tests. Check each school\'s policy.' },
+          { t: 'Application submitted', h: 'Apply through each school\'s application portal. Pay the application fee and send your transcripts.' }]
+          .concat(extra, [
+          { t: 'Admission offer and Form I-20', h: 'After admission, and once you show proof of funds, the school issues the I-20 you need for the visa.' },
+          { t: 'Proof of funds', h: 'Show that you can pay for tuition and living costs for your first year of study.' },
+          { t: 'SEVIS I-901 fee paid', h: 'Pay it before your visa interview and keep the receipt.' },
+          { t: 'DS-160 and visa interview', h: 'Complete the online DS-160, pay the visa fee and attend an interview at a US embassy or consulate.' },
+          housing]);
+      } else if (country.id === 'ca') {
+        list = [passport, docs,
+          { t: 'English or French test result', h: 'Proof of English or French at the level your programme asks for.' },
+          { t: 'Application submitted', h: 'Apply through the university\'s online portal and pay the application fee.' }]
+          .concat(extra, [
+          { t: 'Letter of acceptance', h: 'It must come from a designated learning institution (DLI).' },
+          { t: 'Attestation letter (PAL or TAL)', h: 'Most applicants need a provincial or territorial attestation letter. Quebec asks for a CAQ instead. Master\'s and doctoral students at public institutions are exempt from 2026.' },
+          { t: 'Proof of funds', h: 'You must show you can pay for tuition, living costs and travel. Check the current minimum on the IRCC website.' },
+          { t: 'Study permit application', h: 'Apply online through an IRCC secure account. A letter explaining why you want to study in Canada is recommended. The approval letter is not your permit: you receive the permit at the border.' },
+          housing]);
+      } else {
+        // China
+        list = [passport,
+          { t: 'Diplomas and transcripts ready', h: 'Your school-leaving diploma and grade transcripts, with notarised translations into Chinese or English if they are in another language.' },
+          { t: 'Language test result', h: 'HSK for Chinese-taught programmes (the level varies, often 4 or higher). English-taught programmes usually ask for TOEFL or IELTS.' },
+          { t: 'Application form and study plan', h: 'Complete the university\'s online application for international students. Some ask for a study plan or motivation letter.' },
+          { t: 'Physical examination record', h: 'The Physical Examination Record for Foreigners is usually required for the visa.' }]
+          .concat(extra, [
+          { t: 'Admission notice and JW202 form', h: 'The university sends the admission notice and the Visa Application for Study in China form (JW202, or JW201 for scholarship students).' },
+          { t: 'X1 student visa', h: 'For study longer than six months, apply at the Chinese embassy or consulate, then convert it into a residence permit within 30 days of arriving.' },
+          housing]);
+      }
+
+      // EU applicants need no student visa or non-EU fees in EU destinations.
+      if (originIsEU(origin) && country.eu) {
+        list = list.filter(function (r) { return !r.n; });
+        list.splice(list.length - 1, 0, { t: 'Register your residence after you arrive', h: 'As an EU citizen you do not need a student visa. Check how and when to register in your new country, because there is usually a deadline after arrival.' });
+      }
+
+      // The generic documents item is dropped when a specific Estonian qualification item exists.
+      if (origin === 'EE' && list.some(function (r) { return r.qual; })) {
+        list = list.filter(function (r) { return r !== docs; });
+      }
+
+      return list.map(function (r) { return { id: slug(r.t), t: r.t, h: r.h }; });
+    }
+
+    // ---------------------------------------------------------------
+    // Helpers
+    // ---------------------------------------------------------------
+    var app = document.getElementById('app');
+    var drawer = document.getElementById('drawer');
+    var drawerIn = document.getElementById('drawer-in');
+    var scrim = document.getElementById('scrim');
+
+    var ICON_PLANE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.8 19.2L16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg>';
+    var ICON_CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5l5 5L20 6.5"/></svg>';
+    var ICON_CLOSE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg>';
+
+    function esc(s) {
+      return String(s).replace(/[&<>"']/g, function (c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+      });
+    }
+
+    var store = {
+      get: function (k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } },
+      set: function (k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* storage unavailable */ } }
+    };
+
+    function getQuery() { try { return sessionStorage.getItem('ontofy:q') || ''; } catch (e) { return ''; } }
+    function setQuery(q) { try { sessionStorage.setItem('ontofy:q', q); } catch (e) { /* ignore */ } }
+
+    function getOrigin() {
+      var v = store.get('ontofy:origin');
+      return ORIGINS.some(function (o) { return o.id === v; }) ? v : 'XX';
+    }
+    function setOrigin(v) { store.set('ontofy:origin', v); }
+    function originSelect(id) {
+      var cur = getOrigin();
+      return '<select id="' + id + '" aria-label="Where you are applying from">' +
+        ORIGINS.map(function (o) { return '<option value="' + o.id + '"' + (o.id === cur ? ' selected' : '') + '>' + o.label + '</option>'; }).join('') +
+      '</select>';
+    }
+
+    function findCountry(id) { return COUNTRIES.filter(function (c) { return c.id === id; })[0]; }
+    function findUni(country, id) { return country ? country.unis.filter(function (u) { return u.id === id; })[0] : null; }
+
+    function checkedFor(uniId) { return store.get('ontofy:checks:' + uniId) || []; }
+
+    function progress(country, uni) {
+      var reqs = buildRequirements(country, uni);
+      var done = checkedFor(uni.id).filter(function (id) {
+        return reqs.some(function (r) { return r.id === id; });
+      }).length;
+      return { done: done, total: reqs.length };
+    }
+
+    // ---------------------------------------------------------------
+    // Subject matching
+    // ---------------------------------------------------------------
+    function norm(s) {
+      return String(s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+    }
+
+    // Returns the id of the subject area that best matches the text, or null.
+    function matchArea(text) {
+      var n = norm(text);
+      if (!n) return null;
+      var tokens = n.split(/[^a-z0-9]+/).filter(Boolean);
+      var best = null, score = 0;
+      AREAS.forEach(function (a) {
+        a.words.forEach(function (w) {
+          var hit = w.length <= 3
+            ? tokens.indexOf(w) > -1
+            : n.indexOf(w) > -1 || (n.length >= 4 && w.indexOf(n) === 0);
+          if (hit && w.length > score) { score = w.length; best = a.id; }
+        });
+      });
+      return best;
+    }
+
+    function areaOf(id) { return AREAS.filter(function (a) { return a.id === id; })[0]; }
+    function currentArea() { return matchArea(getQuery()); }
+
+    function matchesFor(country, areaId) {
+      if (!areaId) return country.unis.slice();
+      var list = country.unis.filter(function (u) { return u.a.indexOf(areaId) > -1; });
+      // UK medicine: show the universities with checked requirements first.
+      if (country.id === 'uk' && areaId === 'M') {
+        var rank = { verified: 0, partial: 1, none: 2 };
+        list = list.map(function (u, i) { return { u: u, i: i }; }).sort(function (a, b) {
+          var ra = rank[MEDUK[a.u.id] ? MEDUK[a.u.id].status : 'none'];
+          var rb = rank[MEDUK[b.u.id] ? MEDUK[b.u.id].status : 'none'];
+          return ra - rb || a.i - b.i;
+        }).map(function (x) { return x.u; });
+      }
+      return list;
+    }
+
+    var showAll = {};
+    var PAGE = 5;
+
+    // ---------------------------------------------------------------
+    // Screens
+    // ---------------------------------------------------------------
+    var currentKey = '';
+
+    function renderHome() {
+      app.innerHTML =
+        '<section class="screen home" aria-label="Welcome">' +
+          '<p class="welcome">Welcome to</p>' +
+          '<h1 class="wordmark">Ontofy</h1>' +
+          '<form class="search" id="search" role="search">' +
+            '<label class="sr-only" for="q">What would you like to study?</label>' +
+            '<input id="q" type="text" placeholder="What would you like to study?" autocomplete="off" value="' + esc(getQuery()) + '">' +
+            '<button class="go" type="submit">Search</button>' +
+          '</form>' +
+          '<p class="hint" id="hint" role="alert"></p>' +
+          '<ul class="chips" aria-label="Subjects">' +
+            AREAS.map(function (a) { return '<li><button type="button" class="chip" data-chip="' + esc(a.chip) + '">' + esc(a.chip) + '</button></li>'; }).join('') +
+          '</ul>' +
+          '<p class="origin"><label for="origin-home">Applying from</label>' + originSelect('origin-home') + '</p>' +
+          '<p class="home-note">We show you where you could study it, what you need to apply, and how to get there.</p>' +
+        '</section>';
+
+      var form = document.getElementById('search');
+      var input = document.getElementById('q');
+      var hint = document.getElementById('hint');
+
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var q = input.value.trim();
+        if (!q) { hint.textContent = 'Type a subject first, for example "architecture".'; input.focus(); return; }
+        if (!matchArea(q)) {
+          hint.textContent = 'We don\'t have "' + q + '" yet. Pick one of the subjects below, or try a related word.';
+          input.focus();
+          return;
+        }
+        setQuery(q);
+        showAll = {};
+        location.hash = '#/countries';
+      });
+
+      document.getElementById('origin-home').addEventListener('change', function (e) { setOrigin(e.target.value); });
+
+      app.querySelectorAll('[data-chip]').forEach(function (b) {
+        b.addEventListener('click', function () {
+          input.value = b.getAttribute('data-chip');
+          hint.textContent = '';
+          input.focus();
+        });
+      });
+
+      return input;
+    }
+
+    function renderCountries() {
+      var q = getQuery();
+      var area = currentArea();
+      var heading = q && area ? 'Where could you study ' + esc(q) + '?' : 'Where would you like to study?';
+      var sub = area
+        ? 'We checked the leading universities in ' + COUNTRIES.length + ' countries for ' + esc(areaOf(area).label.toLowerCase()) + '. Pick a country to see them.'
+        : COUNTRIES.length + ' countries to start with. Pick one to see its leading universities.';
+
+      app.innerHTML =
+        '<section class="screen" aria-labelledby="h">' +
+          '<button class="crumb" type="button" data-nav="#/">&larr; New search</button>' +
+          '<h1 class="title" id="h" tabindex="-1">' + heading + '</h1>' +
+          '<p class="sub">' + sub + '</p>' +
+          '<ul class="board">' +
+            COUNTRIES.map(function (c) {
+              var n = matchesFor(c, area).length;
+              var count = n === 0 ? 'None in our list' : (n > PAGE ? 'Top ' + PAGE + ' of ' + n : n + (n === 1 ? ' university' : ' universities'));
+              var inner = '<span class="row-name">' + esc(c.name) + '</span>' +
+                '<span class="row-tag">' + esc(c.tag) + '</span>' +
+                '<span class="row-count">' + count + '</span>';
+              return n === 0
+                ? '<li><div class="row is-empty">' + inner + '</div></li>'
+                : '<li><button class="row" type="button" data-nav="#/country/' + c.id + '">' + inner + '</button></li>';
+            }).join('') +
+          '</ul>' +
+          '<p class="disclaimer">Our list covers leading universities in each country, not every university. Always check that the exact programme exists and what it requires.</p>' +
+        '</section>';
+      return document.getElementById('h');
+    }
+
+    function renderCountry(country) {
+      var q = getQuery();
+      var area = currentArea();
+      var list = matchesFor(country, area);
+      var shown = showAll[country.id] ? list : list.slice(0, PAGE);
+      var a = area ? areaOf(area) : null;
+      var med = area === 'M' ? MED[country.id] : null;
+      var note = med ? med.note : (NOTES[country.id + ':' + area] || null);
+
+      var sub = a
+        ? list.length + ' of the ' + country.unis.length + ' leading universities in our list offer ' + esc(a.label.toLowerCase()) + '.'
+        : 'Leading universities in ' + esc(country.name) + '.';
+
+      app.innerHTML =
+        '<section class="screen" aria-labelledby="h">' +
+          '<button class="crumb" type="button" data-nav="#/countries">&larr; All countries</button>' +
+          '<h1 class="title" id="h" tabindex="-1">' + esc(country.name) + '</h1>' +
+          '<p class="sub">' + sub + ' Hover over one for a preview, or tap it on a phone, then open it to see what you need.</p>' +
+          (note ? '<div class="callout"><strong>Before you choose:</strong> ' + esc(note) + (med && country.id === 'uk' ? ucatFold() : '') + '</div>' : '') +
+          '<ul class="unis">' +
+            shown.map(function (u) {
+              var p = progress(country, u);
+              var done = p.done === p.total;
+              return '<li><button class="uni" type="button" data-uni="' + u.id + '" data-nav="#/country/' + country.id + '/' + u.id + '">' +
+                '<span class="uni-name">' + esc(u.name) + '</span>' +
+                '<span class="uni-city">' + esc(u.city) + '</span>' +
+                '<span class="swap">' +
+                  '<span class="swap-rest">' +
+                    (med ? '<span class="pill lang">' + esc(med.pill) + '</span>' : '') +
+                    (med && country.id === 'uk' && MEDUK[u.id] ? '<span class="pill ' + STATUS[MEDUK[u.id].status].cls + '">' + STATUS[MEDUK[u.id].status].pill + '</span>' : '') +
+                    '<span class="fly">Fly into ' + esc(u.hub) + ' (' + esc(u.code) + ')</span>' +
+                    (p.done ? '<span class="pill' + (done ? ' done' : '') + '">' + p.done + ' of ' + p.total + ' requirements</span>' : '') +
+                  '</span>' +
+                  '<span class="swap-more">' + esc(u.desc) + '<strong>See requirements</strong></span>' +
+                '</span>' +
+              '</button></li>';
+            }).join('') +
+          '</ul>' +
+          (list.length > PAGE && !showAll[country.id]
+            ? '<button class="more" type="button" id="more">Show all ' + list.length + '</button>'
+            : '') +
+          '<p class="disclaimer">Our list covers leading universities, not every university. Subject areas are general, so check that the exact programme exists, its language of instruction and its entry rules.</p>' +
+        '</section>';
+
+      var more = document.getElementById('more');
+      if (more) more.addEventListener('click', function () {
+        showAll[country.id] = true;
+        renderCountry(country);
+        bindNav();
+        var next = app.querySelectorAll('.uni')[PAGE];
+        if (next) next.focus({ preventScroll: false });
+      });
+
+      return document.getElementById('h');
+    }
+
+    function bindNav() {
+      app.querySelectorAll('[data-nav]').forEach(function (b) {
+        b.addEventListener('click', function () { location.hash = b.getAttribute('data-nav'); });
+      });
+    }
+
+    // ---------------------------------------------------------------
+    // Drawer: requirements and flight step
+    // ---------------------------------------------------------------
+    var lastFocus = null;
+    var drawerOpen = false;
+
+    function openDrawer() {
+      if (drawerOpen) return;
+      drawerOpen = true;
+      lastFocus = document.activeElement;
+      drawer.inert = false;
+      drawer.classList.add('open');
+      scrim.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeDrawer() {
+      if (!drawerOpen) return;
+      drawerOpen = false;
+      drawer.classList.remove('open');
+      scrim.classList.remove('open');
+      drawer.inert = true;
+      document.body.style.overflow = '';
+      if (lastFocus && document.contains(lastFocus)) lastFocus.focus();
+    }
+
+    function drawerHead(title, sub) {
+      return '<div class="drawer-top"><div>' +
+        '<h2 class="d-title" id="d-title" tabindex="-1">' + esc(title) + '</h2>' +
+        '<p class="d-sub">' + esc(sub) + '</p></div>' +
+        '<button class="close" type="button" id="close" aria-label="Close">' + ICON_CLOSE + '</button></div>';
+    }
+
+    function bindClose(cid) {
+      document.getElementById('close').addEventListener('click', function () { location.hash = '#/country/' + cid; });
+    }
+
+    var HOUSING_ID = 'housing-plan-for-your-first-weeks';
+    var awaitingStay = false;
+
+    function housingAction() {
+      return '<div class="item-action">' +
+        '<a class="stay-link" id="stay-link" href="' + esc(HOUSING_URL) + '" target="_blank" rel="' + (HOUSING_AFFILIATE ? 'noopener sponsored' : 'noopener') + '">' + esc(HOUSING_LABEL) +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>' +
+        '<span class="sr-only"> (opens in a new tab)</span></a>' +
+        '<span class="stay-note" id="stay-note" role="status"></span>' +
+        '<p class="affil">A hostel can work well for your first weeks while you look for something longer.' +
+          (HOUSING_AFFILIATE ? ' This is an affiliate link: we may earn a commission at no extra cost to you.' : '') + '</p>' +
+      '</div>';
+    }
+
+    // When the person comes back from the new tab, bring them to the housing box.
+    function stayReturn() {
+      if (!awaitingStay || document.visibilityState === 'hidden') return;
+      awaitingStay = false;
+      var note = document.getElementById('stay-note');
+      var box = drawerIn.querySelector('input[value="' + HOUSING_ID + '"]');
+      if (!note || !box) return;
+      note.textContent = box.checked ? 'Welcome back.' : 'Welcome back. If you found a place, tick the box above.';
+      box.scrollIntoView({ block: 'center' });
+      box.focus({ preventScroll: true });
+    }
+    document.addEventListener('visibilitychange', stayReturn);
+    window.addEventListener('focus', stayReturn);
+
+    // Explains the Estonian qualification, so grades like "4.4" or "5 from 5" make sense.
+    function estFold() {
+      if (getOrigin() !== 'EE') return '';
+      return '<div class="med-box"><details class="fold"><summary>About your Estonian qualification</summary><ul>' +
+        '<li>Your school-leaving documents are the gümnaasiumi lõputunnistus (school leaving certificate) and the riigieksamitunnistus (state examination certificate). Universities refer to both.</li>' +
+        '<li>Grades use a 1 to 5 scale: 5 väga hea (90 to 100%), 4 hea (75 to 89%), 3 rahuldav (50 to 74%). The pass mark is 3; 2 and 1 are fails.</li>' +
+        '<li>Three state exams are compulsory: Estonian (or Estonian as a second language), mathematics (narrow or broad paper) and one foreign language (English, German, French or Russian). They are graded out of 100, and passing needs at least 1 point.</li>' +
+        '<li>An average such as 4.4, or 5 from 5 subjects, is read on the 1 to 5 scale. Do not convert it to a percentage yourself.</li>' +
+        '<li>Keep a note of which mathematics paper you sat, narrow or broad, in case a programme asks.</li>' +
+        '</ul><p>Source: <a href="https://harno.ee/eksamid-testid-ja-uuringud/eksamid-testid-ja-lopudokumendid/riigieksamid" target="_blank" rel="noopener">Harno, state examinations</a>. Read on ' + MEDUK_CHECKED + '.</p></details></div>';
+    }
+
+    // How this country's system reads a foreign qualification.
+    function howFold(country) {
+      var how = HOW[country.id];
+      if (!how) return '';
+      return '<div class="med-box"><details class="fold"><summary>How ' + esc(country.name) + ' checks your qualification</summary><ul>' +
+        how.items.map(function (i) { return '<li>' + esc(i) + '</li>'; }).join('') + '</ul>' +
+        (how.src.length ? '<p>Sources: ' + how.src.map(function (s) { return '<a href="' + esc(s.u) + '" target="_blank" rel="noopener">' + esc(s.l) + '</a>'; }).join(', ') + '. Read on ' + MEDUK_CHECKED + '.</p>' : '') +
+        '</details></div>';
+    }
+
+    function ucatFold() {
+      return '<details class="fold"><summary>About the UCAT</summary><ul>' +
+        UCAT_FACTS.map(function (f) { return '<li>' + esc(f) + '</li>'; }).join('') + '</ul></details>';
+    }
+
+    // Verification status, caveats and sources for UK medicine.
+    function medBlock(country, uni) {
+      var m = country.id === 'uk' && currentArea() === 'M' ? MEDUK[uni.id] : null;
+      if (!m) return '';
+      var st = STATUS[m.status];
+      var notes = (m.notes || []).concat(getOrigin() === 'EE' ? (m.notesEE || []) : []);
+      var links = (m.src || []).map(function (s) {
+        return '<a href="' + esc(s.u) + '" target="_blank" rel="noopener">' + esc(s.l) + '</a>';
+      });
+      if (m.status !== 'none') links.push('<a href="https://www.ucat.ac.uk" target="_blank" rel="noopener">UCAT</a>');
+      return '<p class="origin in-drawer"><label for="origin-drawer">Applying from</label>' + originSelect('origin-drawer') + '</p>' +
+        '<div class="med-box">' +
+          '<span class="pill ' + st.cls + '">' + st.pill + '</span>' +
+          '<p>' + esc(st.line) + (getOrigin() === 'EE' && m.checksEE ? ' Showing Estonian figures.' : '') + '</p>' +
+          (notes.length ? '<ul>' + notes.map(function (n) { return '<li>' + esc(n) + '</li>'; }).join('') + '</ul>' : '') +
+          (m.details || []).map(function (d) {
+            return '<details class="fold"><summary>' + esc(d.s) + '</summary><ul>' +
+              d.items.map(function (i) { return '<li>' + esc(i) + '</li>'; }).join('') + '</ul>' +
+              (d.caveat ? '<p>' + esc(d.caveat) + '</p>' : '') + '</details>';
+          }).join('') +
+          (m.status !== 'none' ? ucatFold() : '') +
+          (links.length ? '<p style="margin-top:0.6rem">Sources: ' + links.join(', ') + '</p>' : '') +
+        '</div>';
+    }
+
+    function renderChecklist(country, uni) {
+      var reqs = buildRequirements(country, uni);
+      var saved = checkedFor(uni.id);
+
+      drawerIn.innerHTML =
+        drawerHead(uni.name, uni.city + ', ' + country.name) +
+        medBlock(country, uni) + estFold() + howFold(country) +
+        '<div class="links">' +
+          '<a href="' + esc(uni.url) + '" target="_blank" rel="noopener">University website</a>' +
+          '<a href="' + esc(country.portal.url) + '" target="_blank" rel="noopener">' + esc(country.portal.label) + '</a>' +
+        '</div>' +
+        '<div class="meter">' +
+          '<div class="meter-text"><span>Requirements</span><span id="count"></span></div>' +
+          '<div class="meter-bar" aria-hidden="true"><div class="meter-fill" id="fill"></div></div>' +
+        '</div>' +
+        '<ul class="checks">' +
+          reqs.map(function (r) {
+            return '<li><label class="check">' +
+              '<input type="checkbox" value="' + r.id + '"' + (saved.indexOf(r.id) > -1 ? ' checked' : '') + '>' +
+              '<span class="box">' + ICON_CHECK + '</span>' +
+              '<span class="check-txt"><strong>' + esc(r.t) + '</strong><small>' + esc(r.h) + '</small></span>' +
+            '</label>' + (r.id === HOUSING_ID ? housingAction() : '') + '</li>';
+          }).join('') +
+        '</ul>' +
+        '<div class="cta">' +
+          '<button class="take" type="button" id="take" disabled>' + ICON_PLANE + 'Take me there</button>' +
+          '<p class="cta-note" id="cta-note" aria-live="polite"></p>' +
+        '</div>' +
+        '<p class="caveat">This is a starting checklist built from official guidance. Dates, fees and rules change and differ by programme and nationality, so confirm each item on the official sites above.</p>';
+
+      var boxes = drawerIn.querySelectorAll('.checks input');
+      var take = document.getElementById('take');
+
+      function sync() {
+        var ids = [];
+        boxes.forEach(function (b) { if (b.checked) ids.push(b.value); });
+        store.set('ontofy:checks:' + uni.id, ids);
+        var left = reqs.length - ids.length;
+        document.getElementById('count').textContent = ids.length + ' of ' + reqs.length + ' done';
+        document.getElementById('fill').style.width = (ids.length / reqs.length * 100) + '%';
+        take.disabled = left > 0;
+        document.getElementById('cta-note').textContent = left > 0
+          ? 'Check ' + left + ' more ' + (left === 1 ? 'requirement' : 'requirements') + ' to unlock your flight search.'
+          : 'Everything is checked. Time to book your trip.';
+      }
+
+      boxes.forEach(function (b) { b.addEventListener('change', sync); });
+      take.addEventListener('click', function () { location.hash = '#/country/' + country.id + '/' + uni.id + '/flight'; });
+      bindClose(country.id);
+      var stay = document.getElementById('stay-link');
+      if (stay) stay.addEventListener('click', function () { awaitingStay = true; });
+      var sel = document.getElementById('origin-drawer');
+      if (sel) sel.addEventListener('change', function (e) { setOrigin(e.target.value); renderChecklist(country, uni); var t = document.getElementById('origin-drawer'); if (t) t.focus(); });
+      sync();
+    }
+
+    function airportOptions() {
+      return AIRPORTS_BY[getOrigin()].list.map(function (a) { return '<option value="' + a[0] + '">' + a[1] + '</option>'; }).join('');
+    }
+
+    function renderFlight(country, uni) {
+      var today = new Date().toISOString().slice(0, 10);
+
+      drawerIn.innerHTML =
+        drawerHead('Find your flight', 'To ' + uni.hub + ', for ' + uni.name) +
+        '<div class="ticket" aria-hidden="true"><div class="legs">' +
+          '<div><span class="leg-label">From</span><span class="code muted" id="t-from">---</span></div>' +
+          ICON_PLANE +
+          '<div><span class="leg-label">To</span><span class="code">' + esc(uni.code) + '</span><span class="leg-name">' + esc(uni.hub) + '</span></div>' +
+        '</div></div>' +
+        '<form id="flight" novalidate>' +
+          '<div class="field"><label for="origin">Departure airport code</label>' +
+            '<input class="upper" id="origin" name="origin" type="text" maxlength="3" list="airports" placeholder="' + esc(AIRPORTS_BY[getOrigin()].hint) + '" autocomplete="off" required>' +
+            '<datalist id="airports">' + airportOptions() + '</datalist></div>' +
+          '<div class="field"><label for="date">Departure date</label>' +
+            '<input id="date" name="date" type="date" min="' + today + '" required></div>' +
+          '<p class="error" id="err" role="alert"></p>' +
+          '<button class="take" type="submit">' + ICON_PLANE + 'Search flights</button>' +
+        '</form>' +
+        '<div id="status"></div>' +
+        '<button class="crumb" type="button" id="back" style="margin-top:1.25rem">&larr; Back to requirements</button>' +
+        '<p class="caveat">Prices and availability are shown on the booking site and can change. Flights are a one-way search to the main airport closest to your university.</p>';
+
+      var origin = document.getElementById('origin');
+      var tFrom = document.getElementById('t-from');
+
+      origin.addEventListener('input', function () {
+        var v = origin.value.trim().toUpperCase();
+        tFrom.textContent = v || '---';
+        tFrom.classList.toggle('muted', !v);
+      });
+
+      document.getElementById('back').addEventListener('click', function () {
+        location.hash = '#/country/' + country.id + '/' + uni.id;
+      });
+
+      document.getElementById('flight').addEventListener('submit', function (e) {
+        e.preventDefault();
+        var err = document.getElementById('err');
+        var code = origin.value.trim().toUpperCase();
+        var date = document.getElementById('date').value;
+
+        if (!/^[A-Z]{3}$/.test(code)) { err.textContent = 'Enter a three-letter airport code, for example ' + AIRPORTS_BY[getOrigin()].list[0][0] + '.'; origin.focus(); return; }
+        if (!date || date < today) { err.textContent = 'Pick a departure date from today onward.'; document.getElementById('date').focus(); return; }
+        err.textContent = '';
+
+        var parts = date.split('-');
+        var url = 'https://www.aviasales.com/search/' + code + parts[2] + parts[1] + uni.code + '1?marker=' + encodeURIComponent(MARKER);
+        if (MARKER === 'YOUR_MARKER') console.warn('Ontofy: set MARKER to your Travelpayouts partner marker to earn commission.');
+
+        window.open(url, '_blank', 'noopener');
+
+        document.getElementById('status').innerHTML =
+          '<div class="searching" role="status">' +
+            '<p><strong>Searching flights from ' + esc(code) + ' to ' + esc(uni.hub) + '</strong></p>' +
+            '<div class="track" aria-hidden="true">' + ICON_PLANE + '</div>' +
+            '<p>Results open in a new tab. If nothing opened, <a href="' + esc(url) + '" target="_blank" rel="noopener">open the search here</a>.</p>' +
+          '</div>';
+      });
+
+      bindClose(country.id);
+    }
+
+    // ---------------------------------------------------------------
+    // Router
+    // ---------------------------------------------------------------
+    function route() {
+      var parts = location.hash.replace(/^#\/?/, '').split('/').filter(Boolean);
+      var screen = parts[0] || 'home';
+      var country = screen === 'country' ? findCountry(parts[1]) : null;
+      var uni = country ? findUni(country, parts[2]) : null;
+      var view = parts[3];
+      var key, focusEl;
+
+      if (screen === 'country' && !country) { location.hash = '#/countries'; return; }
+      if (screen !== 'home' && screen !== 'countries' && screen !== 'country') { location.hash = '#/'; return; }
+      // A university only appears on the page if it offers the searched subject.
+      if (uni && currentArea() && uni.a.indexOf(currentArea()) === -1) { location.hash = '#/country/' + country.id; return; }
+
+      key = screen === 'country' ? 'country:' + country.id : screen;
+      document.body.setAttribute('data-screen', screen === 'home' ? 'home' : 'inner');
+
+      if (key !== currentKey) {
+        currentKey = key;
+        if (screen === 'home') focusEl = renderHome();
+        else if (screen === 'countries') focusEl = renderCountries();
+        else focusEl = renderCountry(country);
+
+        bindNav();
+        window.scrollTo(0, 0);
+        if (focusEl) focusEl.focus({ preventScroll: true });
+      }
+
+      if (uni) {
+        var all = progress(country, uni);
+        if (view === 'flight' && all.done < all.total) { location.hash = '#/country/' + country.id + '/' + uni.id; return; }
+        openDrawer();
+        if (view === 'flight') renderFlight(country, uni); else renderChecklist(country, uni);
+        var h = document.getElementById('d-title');
+        if (h) h.focus({ preventScroll: true });
+        drawer.scrollTop = 0;
+      } else {
+        closeDrawer();
+        if (screen === 'country') refreshCards(country);
+      }
+    }
+
+    // Updates progress pills after the drawer closes, without losing the page.
+    function refreshCards(country) {
+      var keep = lastFocus && lastFocus.getAttribute ? lastFocus.getAttribute('data-uni') : null;
+      renderCountry(country);
+      bindNav();
+      if (keep) {
+        var el = app.querySelector('[data-uni="' + keep + '"]');
+        if (el) { lastFocus = el; el.focus({ preventScroll: true }); }
+      }
+    }
+
+    scrim.addEventListener('click', function () {
+      var parts = location.hash.replace(/^#\/?/, '').split('/');
+      location.hash = '#/country/' + parts[1];
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && drawerOpen) {
+        var parts = location.hash.replace(/^#\/?/, '').split('/');
+        location.hash = '#/country/' + parts[1];
+      }
+      // Keep keyboard focus inside the drawer while it is open.
+      if (e.key === 'Tab' && drawerOpen) {
+        var f = drawer.querySelectorAll('a[href], button:not([disabled]), input, select, textarea, [tabindex="0"]');
+        if (!f.length) return;
+        var first = f[0], last = f[f.length - 1];
+        if (e.shiftKey && (document.activeElement === first || document.activeElement === drawer || document.activeElement.id === 'd-title')) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
+    });
+
+    window.addEventListener('hashchange', route);
+    route();
+  </script>
+</body>
+</html>
